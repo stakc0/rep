@@ -73,6 +73,10 @@ export default async function handler(req, res) {
   const path = requestUrl.pathname.replace(/^\/api\//, '').replace(/\/$/, '');
   try {
     if (path === 'deploy' && req.method === 'POST') return res.status(200).json(await directPrepare(req));
+    if (path === 'deploy-confirm' && req.method === 'POST') {
+      const body = JSON.parse((await readBody(req)).toString() || '{}');
+      return res.status(200).json(await directConfirm(body));
+    }
     if (path === 'deploy/confirm' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
       return res.status(200).json(await directConfirm(body));
