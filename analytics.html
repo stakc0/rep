@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b1b1b"><link rel="icon" href="assets/img/politic-logo.png" type="image/png">
+<link rel="stylesheet" href="assets/css/w.css"><title>politic · analytics</title>
+<meta name="description" content="Live politic.fun launchpad analytics: total market cap, volume, and token activity.">
+</head>
+<body data-page="analytics">
+<header class="top">
+  <a class="logo" href="/" aria-label="politic home"><img src="assets/img/politic-logo.png" alt=""><span class="wn">politic<i>_</i></span></a>
+  <nav class="nav" aria-label="main"><a href="/">home</a><a href="/launch">launch</a><a href="/#coins">coins</a><a class="on" href="/analytics">analytics</a><a href="/#destinations">destinations</a><a href="/docs">docs</a></nav>
+  <div class="acts"><a class="br launchb" href="/launch"><span class="p">+</span> launch</a><button class="br" type="button" data-connect>connect</button></div>
+</header>
+<div class="tape" id="tape"><div class="in"><span class="it dim">loading live token analytics…</span><span class="sep">//</span></div></div>
+<main>
+  <section class="wrap sec" style="padding-top:34px">
+    <div class="prompt"><span class="gt">&gt;</span>politic.fun analytics<span class="cur u"></span></div>
+    <h1 style="margin:0;font-size:clamp(26px,4vw,46px)">The launchpad at a glance.</h1>
+    <p class="lede">Live market-cap and volume readings for every confirmed politic launch, refreshed from Solana market pairs through DexScreener.</p>
+    <div class="analytics-grid" id="stats"><div class="box metric"><span>total market cap</span><b>—</b></div><div class="box metric"><span>24h volume</span><b>—</b></div><div class="box metric"><span>launched tokens</span><b>—</b></div><div class="box metric"><span>last refresh</span><b>—</b></div></div>
+  </section>
+  <section class="wrap sec">
+    <div class="box"><div class="hd"><h2>LIVE TOKEN MARKET</h2><div class="ctl"><span id="updated" class="dim">reading…</span><button class="br sm" id="refresh" type="button">refresh</button></div></div><div class="bd" id="table"><div class="empty">reading launched tokens…</div></div></div>
+  </section>
+</main>
+<script src="assets/js/core.js"></script><script src="assets/js/analytics.js"></script>
+</body>
+</html>

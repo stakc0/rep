@@ -21,6 +21,10 @@
     {
       "source": "/docs",
       "destination": "/docs.html"
+    },
+    {
+      "source": "/analytics",
+      "destination": "/analytics.html"
     }
   ],
   "headers": [
