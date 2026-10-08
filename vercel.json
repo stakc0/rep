@@ -1,6 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/token", "destination": "/token.html" },
+    { "source": "/token/(.*)", "destination": "/token.html" },
     { "source": "/launch", "destination": "/launch.html" },
     { "source": "/docs", "destination": "/docs.html" }
   ],

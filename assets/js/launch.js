@@ -5,8 +5,16 @@
   WRLD.typePrompt($('#prompt'), 'launch a coin, wired to the world'); WRLD.tape(); WRLD.nudge();
   $$('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === 'launch'));
 
-  let CFG = { createSol: 0.03, reserveSol: 0.015, minDev: 0.01, maxDev: 10, feeBps: 500, open: true };
-  api('/api/launch?op=config').then(c => { if (c && c.ok) { CFG = c; costs(); } });
+  const DESTINATIONS = [
+    ['Democratic Party', 'https://democrats.org', 'D'], ['Republican Party', 'https://gop.com', 'R'],
+    ['America PAC', 'https://theamericapac.org', 'A'], ['Fairshake', 'https://www.fairshakepac.com', 'F'],
+    ['American Blockchain PAC', 'https://americanblockchainpac.org', 'B'], ['Defend Developers PAC', 'https://defenddeveloperspac.org', 'D'],
+    ['End Citizens United', 'https://endcitizensunited.org', 'E'], ['Club for Growth', 'https://clubforgrowth.org', 'C'],
+    ['Working Families Party', 'https://workingfamilies.org', 'W'], ['Libertarian Party', 'https://lp.org', 'L']
+  ];
+  $('#partyGrid').innerHTML = DESTINATIONS.map(([name,site,mark]) => `<button class="br sm party" type="button" data-site="${site}" title="${name}"><img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(site)}&sz=64" alt=""> ${name}</button>`).join('');
+  $('#partyGrid').addEventListener('click', e => { const b=e.target.closest('[data-site]'); if(!b)return; $('#fWeb').value=b.dataset.site; $$('#partyGrid [data-site]').forEach(x=>x.classList.toggle('on',x===b)); toast('Destination set: '+b.title); });
+
 
   // ---------- the rulebook ----------
   const eds = [];
@@ -141,18 +149,24 @@
 
   $('#go').addEventListener('click', async e => {
     err('');
-    const name = $('#fName').value.trim(), symbol = $('#fSym').value.trim().replace(/^\$/, '').toUpperCase();
+    const name = $('#fName').value.trim(), symbol = $('#fSym').value.trim().replace(/^\$/, '').toUpperCase(), domainSite = $('#fWeb').value.trim();
     if (!name) return err('Give the coin a name.');
     if (!/^[A-Z0-9]{1,10}$/.test(symbol)) return err('The ticker is 1–10 letters or numbers.');
     if (!IMG) return err('Add a picture for the coin.');
+    if (!/^https:\/\//i.test(domainSite)) return err('Choose a political destination or paste its HTTPS site link.');
     const raw = eds.map(x => x.get()); if (!raw.length || raw.some(r => !r)) return err('Finish every rule (or remove the unfinished one).');
-    const launcher = $('#fWal').value.trim(); if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(launcher)) return err('Connect a wallet or paste your Solana address.');
+    const w = WRLD.wallet() || await WRLD.connect(); if (!w) return err('Connect a Solana wallet first.');
     if (!$('#fOk').checked) return err('Tick the box to confirm you understand how the engine works.');
-    const b = e.currentTarget; b.disabled = true; b.textContent = 'recording…';
-    const r = await post('/api/launch?op=prepare', { launcher, name, symbol, description: $('#fDesc').value.trim(), twitter: $('#fX').value.trim(), website: $('#fWeb').value.trim(), image: IMG, devBuy: Number($('#fDev').value), rules: raw });
-    b.disabled = false; b.innerHTML = 'launch <span class="k">-&gt;</span>';
-    if (!r || !r.ok) return err((r && r.error) || 'The launch didn’t record. Try again.');
-    track({ ...r, symbol });
-    toast('Rulebook ' + r.fp + ' recorded');
+    const b = e.currentTarget; b.disabled = true; b.textContent = 'preparing…'; $('#flow').hidden = false; $('#dep').innerHTML = '<div class="msg">uploading metadata and preparing the two Pump V2 transactions…</div>';
+    try {
+      const image = await (await fetch(IMG)).blob(); const body = new FormData();
+      body.set('launch', JSON.stringify({ wallet:w.pk, name, symbol, description:$('#fDesc').value.trim(), domainUrl:domainSite, initialBuySol:String($('#fDev').value) }));
+      body.set('file', image, 'token.jpg'); const prepared = await fetch('/api/deploy', { method:'POST', body }).then(async r => { const j=await r.json(); if(!r.ok) throw Error(j.error||'Launch preparation failed.'); return j; });
+      const steps = prepared.transactions || [{ phase:'single', transaction:prepared.transaction }];
+      if (!steps[0]?.transaction) throw Error('No Pump V2 transaction was prepared.');
+      if (!window.solanaWeb3) await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://unpkg.com/@solana/web3.js@1.98.2/lib/index.iife.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);});
+      for (const step of steps) { const tx=window.solanaWeb3.VersionedTransaction.deserialize(Uint8Array.from(atob(step.transaction),c=>c.charCodeAt(0))); $('#dep').innerHTML=`<div class="msg">approve ${step.phase==='buy'?'the initial buy':'the token creation'} in your wallet…</div>`; if(!w.p.signTransaction) throw Error('This wallet cannot sign the launch transaction.'); const signed=await w.p.signTransaction(tx); const encoded=btoa(String.fromCharCode(...signed.serialize())); const confirmed=await fetch('/api/deploy/confirm',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intentId:prepared.intentId,phase:step.phase,transaction:encoded})}).then(async r=>{const j=await r.json();if(!r.ok)throw Error(j.error||'Launch confirmation failed.');return j;}); if(confirmed.status!=='confirmed') throw Error('Launch is still confirming.'); }
+      $('#dep').innerHTML=`<div class="msg ok"><b>$${esc(symbol)} is live.</b><div class="cta" style="margin-top:10px"><a class="btn" href="/token?m=${esc(prepared.mint)}">open the political token page <span class="k">-&gt;</span></a><a class="br" href="https://pump.fun/coin/${esc(prepared.mint)}" target="_blank" rel="noopener">pump.fun</a></div><div style="margin-top:10px;font-size:12px">destination site: ${esc(domainSite)}<br>metadata: https://politic.fun/token/${esc(prepared.mint)}</div></div>`; toast('Political destination launch confirmed');
+    } catch (ex) { err(ex.message || 'Launch failed.'); $('#dep').innerHTML = `<div class="msg"><span class="red">${esc(ex.message || 'Launch failed.')}</span></div>`; } finally { b.disabled = false; b.innerHTML = 'launch <span class="k">-&gt;</span>'; }
   });
 })();

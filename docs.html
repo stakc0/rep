@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f6f3ec">
 <link rel="icon" href="assets/img/fav32.png" sizes="32x32"><link rel="icon" href="assets/img/fav64.png" sizes="64x64"><link rel="apple-touch-icon" href="assets/img/fav180.png">
-<meta property="og:type" content="website"><meta property="og:site_name" content="wrld"><meta property="og:image" content="https://wrld-fun.vercel.app/assets/img/og.jpg">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://wrld-fun.vercel.app/assets/img/og.jpg">
+<meta property="og:type" content="website"><meta property="og:site_name" content="politic"><meta property="og:image" content="https://politic-fun.vercel.app/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://politic-fun.vercel.app/assets/img/og.jpg">
 <link rel="preload" href="assets/fonts/jbm.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/w.css">
-<script>window.WRLD_CONFIG = { ca: 'Ebugdjc8mh84WakL8n4cd1nnuAW2R2beeTiZoBK5pump', x: 'https://x.com/wrldpad' };</script>
+<script>window.WRLD_CONFIG = { ca: 'Ebugdjc8mh84WakL8n4cd1nnuAW2R2beeTiZoBK5pump', x: 'https://x.com/politicpad' };</script>
 
-<title>wrld · docs</title>
-<meta name="description" content="How wrld works: the rulebook language, the sensors, the engine, custody, costs and failure paths.">
-<meta property="og:title" content="wrld · docs">
+<title>politic · docs</title>
+<meta name="description" content="How politic works: the rulebook language, the sensors, the engine, custody, costs and failure paths.">
+<meta property="og:title" content="politic · docs">
 </head>
 <body data-page="docs">
 <header class="top">
-  <a class="logo" href="/" aria-label="wrld home"><span class="wn">wrld<i>_</i></span></a>
+  <a class="logo" href="/" aria-label="politic home"><span class="wn">politic<i>_</i></span></a>
   <nav class="nav" aria-label="main">
     <a href="/" data-nav="home">home</a><a href="/launch" data-nav="launch">launch</a><a href="/#coins" data-nav="coins">coins</a><a href="/#engine" data-nav="how">how it works</a><a href="/docs" data-nav="docs">docs</a>
   </nav>
@@ -32,22 +32,22 @@
     <div class="h">engine</div><a href="/docs#custody">custody</a><a href="/docs#fees">fees and the chest</a><a href="/docs#sources">sources, live</a><a href="/docs#failures">failure paths</a><a href="/docs#api">api</a>
   </nav>
   <article class="prose">
-    <h1>wrld docs</h1>
+    <h1>politic docs</h1>
     <div class="meta3">5 min read · <a href="/docs#" data-copy-link>copy link</a></div>
-    <div class="note"><b>the uncomfortable part first.</b> wrld is custodial. The engine holds each coin’s wallet, the wallet that pump.fun pays creator fees to, and it spends from it when rules fire. That is the only way a rule can act without someone signing. It is the same model rulr uses. Everything below is about what that wallet can and can’t do, and how to check it.</div>
+    <div class="note"><b>the uncomfortable part first.</b> politic is custodial. The engine holds each coin’s wallet, the wallet that pump.fun pays creator fees to, and it spends from it when rules fire. That is the only way a rule can act without someone signing. It is the same model rulr uses. Everything below is about what that wallet can and can’t do, and how to check it.</div>
 
     <h2 id="overview"><span class="e">01</span>overview</h2>
-    <p>Every coin launched on wrld comes with a rulebook: up to six rules of the form <code>when &lt;the world does something&gt; -&gt; &lt;the coin does something&gt;</code>. The world is read from public sources: world events (live Polymarket odds on war, politics and money), prices, sports results and the weather. Posts on X switch on once the X API key is set. The coin acts with its own money, the creator fees its trading produces.</p>
+    <p>Every coin launched on politic comes with a rulebook: up to six rules of the form <code>when &lt;the world does something&gt; -&gt; &lt;the coin does something&gt;</code>. The world is read from public sources: world events (live Polymarket odds on war, politics and money), prices, sports results and the weather. Posts on X switch on once the X API key is set. The coin acts with its own money, the creator fees its trading produces.</p>
 
     <h2 id="launching"><span class="e">02</span>launching</h2>
     <ul>
       <li>You fill in the coin (name, ticker, picture), write the rulebook and choose a first buy.</li>
-      <li>wrld records it, derives the coin’s wallet and its mint address, and tells you one amount to send.</li>
+      <li>politic records it, derives the coin’s wallet and its mint address, and tells you one amount to send.</li>
       <li>You send that one SOL transfer. No program approvals and no other signature.</li>
       <li>The engine creates the coin on pump.fun from the coin’s wallet with your first buy, then sends the tokens and any unused SOL to your wallet.</li>
       <li>From that moment the rules watch the world. Anything that happened before launch never counts.</li>
     </ul>
-    <table class="costs" style="max-width:520px"><tr><td>first buy</td><td>your choice, 0.01–10 SOL (+2% for fees)</td></tr><tr><td>pump.fun rent and fees</td><td>about 0.03 SOL, the unused part comes back</td></tr><tr><td>gas reserve, kept in the coin’s wallet</td><td>0.015 SOL</td></tr><tr><td>wrld’s cut</td><td>nothing at launch; 5% of each fee claim</td></tr></table>
+    <table class="costs" style="max-width:520px"><tr><td>first buy</td><td>your choice, 0.01–10 SOL (+2% for fees)</td></tr><tr><td>pump.fun rent and fees</td><td>about 0.03 SOL, the unused part comes back</td></tr><tr><td>gas reserve, kept in the coin’s wallet</td><td>0.015 SOL</td></tr><tr><td>politic’s cut</td><td>nothing at launch; 5% of each fee claim</td></tr></table>
 
     <h2 id="language"><span class="e">03</span>the language</h2>
     <p>Rules are stored as data and shown as one line each. The fingerprint is the first 12 hex characters of the SHA-256 of the rulebook’s canonical JSON. It is written into the coin’s pump.fun description at launch, so anyone can check the rulebook on the coin’s page against it.</p>
@@ -85,13 +85,13 @@
     <h2 id="custody"><span class="e">07</span>custody</h2>
     <p>Each coin’s wallet and mint keys are derived on the server from one master secret and the launch id, using HMAC-SHA256. They are never stored. The derived wallet is the coin’s pump.fun creator, so pump.fun pays creator fees to it.</p>
     <ul>
-      <li>The engine’s code has four spending actions, the four above, plus the launch hand-back, refunds and wrld’s 5%.</li>
+      <li>The engine’s code has four spending actions, the four above, plus the launch hand-back, refunds and politic’s 5%.</li>
       <li>You can audit every one: the coin’s wallet is public, and each action appears in the coin’s log with its transaction.</li>
       <li>What you are trusting: that the engine keeps running, and that the master secret stays secret. If either fails, rules stop firing; the fees stay in the coin’s wallet.</li>
     </ul>
 
     <h2 id="fees"><span class="e">08</span>fees and the chest</h2>
-    <p>When at least 0.003 SOL of creator fees is waiting, the engine claims it into the coin’s wallet. wrld takes 5% of each claim. The rest, minus a 0.015 SOL gas reserve, is the chest that rules spend from. Swaps go through PumpPortal’s local transaction API, which adds its own 0.5% to each trade.</p>
+    <p>When at least 0.003 SOL of creator fees is waiting, the engine claims it into the coin’s wallet. politic takes 5% of each claim. The rest, minus a 0.015 SOL gas reserve, is the chest that rules spend from. Swaps go through PumpPortal’s local transaction API, which adds its own 0.5% to each trade.</p>
 
     <h2 id="sources"><span class="e">09</span>sources, live</h2>
     <p>Each row times a real read from the server right now.</p>
