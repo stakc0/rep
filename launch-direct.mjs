@@ -45,9 +45,10 @@ export async function directPrepare(req) {
   if(!name || new TextEncoder().encode(name).length>32 || !/^[A-Z0-9]{2,10}$/.test(symbol) || description.length>2000) fail('Invalid name, ticker, or description.');
   const rpc=process.env.PUMP_RPC_URL||process.env.LOOT_RPC_URL||'https://api.mainnet-beta.solana.com'; const connection=new Connection(rpc,'confirmed');
   const online=new OnlinePumpSdk(connection); const [global,feeConfig]=await Promise.all([online.fetchGlobal(),online.fetchFeeConfig()]);
-  const quoteAmount=new BN(budgetLamports.toString()); const amount=getBuyTokenAmountFromSolAmount({global,feeConfig,mintSupply:null,bondingCurve:null,amount:quoteAmount,quoteMint:NATIVE_MINT}); if(amount.isZero()) fail('Pump returned a zero-token quote.',422);
+  const creatorFeeBps = new BN(global.creatorFeeBasisPoints.toString());
+  const quoteAmount=new BN(budgetLamports.toString()); const amount=getBuyTokenAmountFromSolAmount({global,feeConfig,mintSupply:null,bondingCurve:null,amount:quoteAmount,quoteMint:NATIVE_MINT,creatorFeeBps}); if(amount.isZero()) fail('Pump returned a zero-token quote.',422);
   const mint=Keypair.generate(); const tokenDirectory=`https://politic.fun/${mint.publicKey.toBase58()}`; const uri=await uploadMetadata(mint.publicKey,image,{name,symbol,description},tokenDirectory); const latest=await connection.getLatestBlockhash('confirmed');
-  const create=await PUMP_SDK.createV2Instruction({mint:mint.publicKey,user:wallet,creator:TREASURY,name,symbol,uri,mayhemMode:false,holderReward:false,cashback:false});
+  const create=await PUMP_SDK.createV2Instruction({mint:mint.publicKey,user:wallet,creator:TREASURY,name,symbol,uri,creatorFeeBps,mayhemMode:false,holderReward:false,cashback:false});
   const ata=getAssociatedTokenAddressSync(mint.publicKey,wallet,true,TOKEN_2022_PROGRAM_ID);
   const buy=await PUMP_SDK.getBuyV2InstructionRaw({user:wallet,mint:mint.publicKey,creator:TREASURY,amount,quoteAmount,feeRecipient:global.feeRecipient,buybackFeeRecipient:global.buybackFeeRecipients[0],tokenProgram:TOKEN_2022_PROGRAM_ID,quoteMint:NATIVE_MINT,quoteTokenProgram:TOKEN_PROGRAM_ID});
   const createMessage=new TransactionMessage({payerKey:wallet,recentBlockhash:latest.blockhash,instructions:[create]}).compileToV0Message(); const createTx=new VersionedTransaction(createMessage); createTx.sign([mint]);
