@@ -23,13 +23,18 @@
   $('#fImg').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
     if (f.size > 8 * 1024 * 1024) { toast('That picture is over 8 MB'); return; }
-    const im = new Image(); im.onload = () => {
-      const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d');
-      const s = Math.max(512 / im.width, 512 / im.height), w = im.width * s, h = im.height * s;
-      x.fillStyle = '#f6f3ec'; x.fillRect(0, 0, 512, 512); x.drawImage(im, (512 - w) / 2, (512 - h) / 2, w, h);
-      IMG = c.toDataURL('image/jpeg', .88); $('#drop').innerHTML = `<img src="${IMG}" alt="coin picture">`; URL.revokeObjectURL(im.src);
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(f.type)) { toast('Use a PNG, JPEG, WebP, or GIF'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const im = new Image(); im.onload = () => {
+        const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d');
+        const s = Math.max(512 / im.width, 512 / im.height), w = im.width * s, h = im.height * s;
+        x.fillStyle = '#f6f3ec'; x.fillRect(0, 0, 512, 512); x.drawImage(im, (512 - w) / 2, (512 - h) / 2, w, h);
+        IMG = c.toDataURL('image/jpeg', .88); $('#drop').innerHTML = `<img src="${IMG}" alt="coin picture"><span class="pic-ok">image ready</span>`; $('#drop').classList.add('has-image');
+      };
+      im.onerror = () => toast('That picture couldn’t be read'); im.src = reader.result;
     };
-    im.onerror = () => toast('That picture couldn’t be read'); im.src = URL.createObjectURL(f);
+    reader.onerror = () => toast('That picture couldn’t be read'); reader.readAsDataURL(f);
   });
   $('#drop').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#fImg').click(); } });
 
