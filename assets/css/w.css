@@ -355,3 +355,13 @@ html { background-color:var(--paper); background-image:radial-gradient(#353532 1
 .route-card { min-height:320px; overflow:hidden; }
 .route-card > pre, .route-card > .pins { position:relative; z-index:1; text-shadow:0 1px 8px var(--paper); }
 @media(max-width:700px){.route-card{min-height:280px}}
+
+/* final media framing */
+.logo img { width: 48px; height: 36px; object-fit: contain; object-position: center; }
+.logo { gap: 8px; }
+.route-card { width: 285px; min-height: 215px; height: 215px; justify-self: end; border-radius: 18px; }
+.video-frame { inset: 10px; border-radius: 16px; mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%); -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%); mask-composite: intersect; -webkit-mask-composite: source-in; }
+.video-frame video { object-fit: contain; border-radius: 16px; background: #090909; }
+.route-card > pre { font-size: 10px; line-height: 1.15; }
+.route-card > .pins { font-size: 10px; }
+@media(max-width:700px){.route-card{width:260px;height:195px;min-height:195px;justify-self:start}.logo img{width:44px;height:34px}}
