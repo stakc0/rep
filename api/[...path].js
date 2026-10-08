@@ -32,6 +32,33 @@ async function politicalMarkets() {
   return { ok: true, at: Date.now(), markets: markets.sort((a, b) => b.volume - a.volume).slice(0, 8) };
 }
 
+let tokenCache = { at: 0, tokens: [] };
+const CREATOR_FEE_WALLET = '1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN';
+async function tokenImage(uri) {
+  if (!uri) return '';
+  try { const r = await fetch(uri, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(5000) }); const j = await r.json(); return j.image || j.image_url || ''; } catch { return ''; }
+}
+async function tokenMarkets() {
+  const rows = await listLaunches();
+  const tokens = await Promise.all(rows.slice(0, 100).map(async row => {
+    let market = {};
+    try {
+      const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(row.mint)}`, { headers: { accept: 'application/json', 'user-agent': 'politic.fun/1.0' }, signal: AbortSignal.timeout(6000) });
+      const j = await r.json();
+      const pairs = (j.pairs || []).filter(x => x.chainId === 'solana').sort((a, b) => Number(b.liquidity?.usd || 0) - Number(a.liquidity?.usd || 0));
+      const pair = pairs[0];
+      if (pair) market = { marketCapUsd: Number(pair.marketCap || pair.fdv || 0), volume24hUsd: Number(pair.volume?.h24 || 0), priceUsd: Number(pair.priceUsd || 0), dexUrl: pair.url || '' };
+    } catch {}
+    const image = row.image_url || await tokenImage(row.metadata_uri);
+    return { ...row, image, ...market, creatorFeeWallet: CREATOR_FEE_WALLET };
+  }));
+  return tokens;
+}
+async function listedTokens() {
+  if (Date.now() - tokenCache.at < 10000) return tokenCache.tokens;
+  tokenCache = { at: Date.now(), tokens: await tokenMarkets() }; return tokenCache.tokens;
+}
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -50,7 +77,7 @@ export default async function handler(req, res) {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
       return res.status(200).json(await directConfirm(body));
     }
-    if (path === 'tokens' && req.method === 'GET') return res.status(200).json({ ok: true, tokens: await listLaunches() });
+    if (path === 'tokens' && req.method === 'GET') return res.status(200).json({ ok: true, at: Date.now(), creatorFeeWallet: CREATOR_FEE_WALLET, tokens: await listedTokens() });
     if (path === 'politics' && req.method === 'GET') return res.status(200).json(await politicsNews());
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
     if (!['world', 'coins', 'launch', 'tick'].includes(path)) return res.status(404).json({ ok: false, error: 'Not found' });

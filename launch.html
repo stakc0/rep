@@ -12,7 +12,7 @@
 <script>window.WRLD_CONFIG = { ca: '2eMzJcDLaBsnPx9KaCttikGjw5xixEmTbb1Du7Pfpump', x: 'https://x.com/politicdotfun' };</script>
 
 <title>politic · launch</title>
-<meta name="description" content="Launch a pump.fun coin with a declared political destination and visible fee route.">
+<meta name="description" content="Launch a pump.fun coin with a declared political destination and visible political destination.">
 <meta property="og:title" content="politic.fun · launch with a political destination">
 </head>
 <body data-page="launch">
@@ -36,7 +36,7 @@
             <div class="fld"><label for="fName">name</label><input id="fName" type="text" maxlength="32" placeholder="name of the coin" autocomplete="off"></div>
             <div class="fld"><label for="fSym">ticker</label><input id="fSym" type="text" maxlength="10" placeholder="TICKER" autocomplete="off" style="text-transform:uppercase"></div>
           </div>
-          <div class="fld"><label for="fDesc">description (pump.fun shows it; the rulebook line is added after it)</label><textarea id="fDesc" maxlength="500" placeholder="what the coin is about"></textarea></div>
+          <div class="fld"><label for="fDesc">description (pump.fun shows it)</label><textarea id="fDesc" maxlength="500" placeholder="what the coin is about"></textarea></div>
           <div class="pic"><label class="drop" id="drop" for="fImg" tabindex="0">+ picture<br>png · jpg · gif</label><input id="fImg" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
             <div class="dim" style="font-size:12px">square works best. it is cropped to 512×512.</div></div>
           <div class="fld"><label for="fWeb">political destination site</label><input id="fWeb" type="url" placeholder="https://official-party-or-pac.org" required></div>
@@ -44,18 +44,9 @@
         </div>
       </section>
 
-      <section class="box step" id="s2">
-        <div class="hd"><h2>02 · FEE ROUTE</h2><div class="ctl"><span id="rCount"></span></div></div>
-        <div class="bd">
-          <p class="sub">The launch destination is the political party or PAC selected above. This route is attached to the launch metadata so the intended beneficiary is visible before trading starts.</p>
-          <div class="chips" id="tchips"></div>
-          <div id="rules"></div>
-          <div class="cta" style="margin-top:12px"><button class="br" type="button" id="addRule"><span class="p">+</span> add a rule</button><button class="br" type="button" id="evalAll">review route details</button></div>
-        </div>
-      </section>
 
       <section class="box step" id="s3">
-        <div class="hd"><h2>03 · THE FIRST BUY</h2></div>
+        <div class="hd"><h2>02 · THE FIRST BUY</h2></div>
         <div class="bd">
           <p class="sub">pump.fun coins launch with a first buy. The tokens it buys are sent to your wallet right after the coin is created.</p>
           <div class="fld"><label for="fDev">first buy: <b id="devV">0.10</b> SOL</label><input id="fDev" class="range" type="range" min="0.01" max="5" step="0.01" value="0.1"></div>
@@ -64,12 +55,12 @@
       </section>
 
       <section class="box step" id="s4">
-        <div class="hd"><h2>04 · LAUNCH</h2></div>
+        <div class="hd"><h2>03 · LAUNCH</h2></div>
         <div class="bd">
           <div class="fld"><label for="fWal">your wallet (your first-buy tokens and any refund go here)</label>
             <div class="addr"><input id="fWal" type="text" placeholder="connect, or paste a Solana address" style="flex:1;min-width:220px" autocomplete="off"><button class="br" type="button" data-connect>connect</button></div></div>
           <label class="dim" style="display:flex;gap:10px;align-items:flex-start;font-size:12.5px;margin:6px 0 14px"><input type="checkbox" id="fOk" style="margin-top:4px">
-            <span>I understand politic is custodial: the engine holds this coin’s wallet and spends its claimed fees only as the rulebook says. politic takes 5% of each claim. Memecoins can go to zero.</span></label>
+            <span>I understand politic is custodial: creator fees are sent to <code>1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN</code>. The selected party or PAC is recorded as the public political destination. Memecoins can go to zero.</span></label>
           <button class="btn" type="button" id="go">launch <span class="k">-&gt;</span></button>
           <div id="err" class="msg" style="margin-top:14px" hidden></div>
           <div id="flow" style="margin-top:16px" hidden>
@@ -81,15 +72,13 @@
     </div>
 
     <aside class="side">
-      <div class="box"><div class="hd"><h2>FEE ROUTE</h2><div class="ctl"><span id="fp" class="dim"></span><button class="br sm" type="button" id="cpBook">copy</button></div></div>
-        <div class="bd"><div class="code" id="book"></div><div id="evals" style="margin-top:10px;font-size:12px"></div></div></div>
       <div class="box"><div class="hd"><h2>WHAT HAPPENS</h2></div>
         <div class="bd" style="font-size:12.5px;color:var(--ink2)">
-          <div>1. we record the coin and its rulebook and give you its wallet</div>
+          <div>1. we record the coin and its political destination and give you its wallet</div>
           <div>2. you send one SOL transfer to that wallet</div>
           <div>3. the engine creates the coin on pump.fun from it, with your first buy</div>
           <div>4. your tokens and any unused SOL come back to you</div>
-          <div>5. from then on the selected political destination stays attached to the coin’s public page</div>
+          <div>5. creator fees route to 1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN and the selected destination stays visible on the coin’s public page</div>
         </div></div>
     </aside>
   </div>

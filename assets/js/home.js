@@ -108,18 +108,20 @@
 
   // ---------- coins and the fired feed ----------
   const EMPTY = `<pre aria-hidden="true">   .------------------.\n   |  no coins yet    |\n   '------------------'</pre>`;
+  const money = v => { const n = Number(v || 0); return n >= 1e9 ? '$' + (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? '$' + (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? '$' + Math.round(n / 1e3) + 'K' : n ? '$' + n.toFixed(2) : '—'; };
+  const tokenImage = c => c.image || c.image_url || c.metadataImage || '';
   async function coins() {
-    const r = await api('/api/coins');
-    const list = (r && r.coins) || [];
-    $('#coinsN').textContent = r && r.ok ? `${list.filter(c => c.state === 'live').length} live` : '';
-    if (r && r.ok) WRLD.countUp($('#stLive'), list.filter(c => c.state === 'live').length, v => String(Math.round(v)), 600); else $('#stLive').textContent = '—';
-    if (!r || !r.ok) { $('#coinsBd').innerHTML = '<div class="empty"><span class="off">the registry didn’t answer · retrying</span></div>'; return; }
-    if (!list.length) { $('#coinsBd').innerHTML = `<div class="empty">${EMPTY}No coins yet. The first coin wired to the world could be yours. <a class="u" href="/launch">launch one</a>.</div>`; return; }
-    $('#coinsBd').innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>coin</th><th>rules</th><th class="hide-s">fired</th><th class="hide-s">claimed</th><th>mcap</th></tr></thead><tbody>${list.map(c => `
-      <tr><td><a class="coin" href="/coin?m=${esc(c.mint)}"><img src="${esc(c.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span><b>$${esc(c.symbol)}</b><span class="rl">${esc(c.name)}${c.state !== 'live' ? ' · ' + esc(c.state) : ''}</span></span></a></td>
-      <td class="rl">${c.rules.slice(0, 2).map(x => esc(x.words)).join('<br>')}${c.rules.length > 2 ? `<br>+${c.rules.length - 2} more` : ''}</td>
-      <td class="hide-s">${c.fires || 0}${c.lastFireAt ? `<br><span class="rl">${ago(c.lastFireAt)}</span>` : ''}</td><td class="hide-s">${sol(c.claimedSol)}</td><td>${usd(c.mcapUsd)}</td></tr>`).join('')}</tbody></table></div>`;
+    const r = await api('/api/tokens');
+    const list = (r && r.tokens) || [];
+    $('#coinsN').textContent = r && r.ok ? `${list.length} launched` : '';
+    if (r && r.ok) WRLD.countUp($('#stLive'), list.length, v => String(Math.round(v)), 600); else $('#stLive').textContent = '—';
+    if (!r || !r.ok) { $('#coinsBd').innerHTML = '<div class="empty"><span class="off">the token registry didn’t answer · retrying</span></div>'; return; }
+    if (!list.length) { $('#coinsBd').innerHTML = `<div class="empty">No coins yet. <a class="u" href="/launch">launch the first one</a>.</div>`; return; }
+    $('#coinsBd').innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>coin</th><th>market cap</th><th>volume 24h</th><th>price</th></tr></thead><tbody>${list.map(c => `
+      <tr><td><a class="coin" href="/${esc(c.mint)}"><img src="${esc(tokenImage(c))}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span><b>$${esc(c.symbol)}</b><span class="rl">${esc(c.name)}</span></span></a></td>
+      <td>${money(c.marketCapUsd)}</td><td>${money(c.volume24hUsd)}</td><td>${c.priceUsd ? '$' + Number(c.priceUsd).toPrecision(4) : '—'}</td></tr>`).join('')}</tbody></table></div>`;
   }
+
   async function feed() {
     const r = await api('/api/coins?op=log');
     const log = (r && r.log) || [];
@@ -158,5 +160,5 @@
   // the engine's heartbeat: when it last read the world, from its own lock
   api('/api/coins?op=stats').then(s => { if (s && s.ok && s.lastTick) { $('#stTick').textContent = ago(s.lastTick); $('#stTickL').textContent = 'since the engine last read the world (it runs every ~5 min)'; } });
 
-  coins(); feed(); setInterval(() => { if (!document.hidden) { coins(); feed(); } }, 30000);
+  coins(); feed(); setInterval(() => { if (!document.hidden) { coins(); feed(); } }, 15000);
 })();
