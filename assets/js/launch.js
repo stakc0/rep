@@ -2,7 +2,7 @@
 (function () {
   const { $, $$, esc, api, post, sol, hl, toast, copy, short } = WRLD;
   const WR = window.WR;
-  WRLD.typePrompt($('#prompt'), 'launch a coin, wired to a political destination'); WRLD.tape(); WRLD.nudge();
+  WRLD.typePrompt($('#prompt'), 'launch a coin, fees routed to a political destination'); WRLD.tape(); WRLD.nudge();
   $$('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === 'launch'));
 
   const DESTINATIONS = [

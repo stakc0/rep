@@ -12,8 +12,8 @@
 <script>window.WRLD_CONFIG = { ca: 'Ebugdjc8mh84WakL8n4cd1nnuAW2R2beeTiZoBK5pump', x: 'https://x.com/politicdotfun' };</script>
 
 <title>politic</title>
-<meta name="description" content="Launch pump.fun coins wired to the world. Rules on war, politics, money, prices, sports and weather. The world moves, your coin moves. Every action on-chain.">
-<meta property="og:title" content="politic · the world moves, your coin moves"><meta property="og:description" content="A political launchpad where fees route toward the party or PAC you choose.">
+<meta name="description" content="Launch pump.fun coins and choose which US political party or PAC receives the fee route.">
+<meta property="og:title" content="politic.fun · launch with a destination"><meta property="og:description" content="A political launchpad where every coin declares its party or PAC destination.">
 <style>#live,#events,#try,#rulebooks,#fired,#engine,#faq{display:none!important}.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.dest-grid a{display:grid;grid-template-columns:28px 1fr;gap:4px 10px;padding:16px;background:var(--paper);font-weight:700}.dest-grid a:hover{background:var(--paper2)}.dest-grid img{width:24px;height:24px;grid-row:span 2;object-fit:contain;filter:grayscale(1)}.dest-grid span{font-size:11px;color:var(--mid);font-weight:400}@media(max-width:700px){.dest-grid{grid-template-columns:1fr}}</style></head>
 <body data-page="home">
 <header class="top">
@@ -23,7 +23,7 @@
   </nav>
   <div class="acts"><a class="br launchb" href="/launch"><span class="p">+</span> launch</a><button class="br" type="button" data-connect>connect</button></div>
 </header>
-<div class="tape" id="tape" aria-label="live readings"><div class="in"><span class="it dim">reading the world…</span><span class="sep">//</span><span class="it dim">reading the world…</span><span class="sep">//</span></div></div>
+<div class="tape" id="tape" aria-label="political fee routing"><div class="in"><span class="it dim">fees follow the destination…</span><span class="sep">//</span><span class="it dim">fees follow the destination…</span><span class="sep">//</span></div></div>
 
 
 <main>
@@ -48,13 +48,23 @@
 <span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span> <span class="s2">\</span><span class="f2">###</span>  <span class="s2">/</span>  <span class="f2">##</span>   <span class="s2">____|</span> <span class="s2">\____</span><span class="f2">##</span><span class="s2">\</span>
 <span class="s2">\</span><span class="f2">#######</span><span class="s2">\</span> <span class="s2">\</span><span class="f2">######</span>  <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|\</span><span class="f2">######</span>  <span class="s2">|</span>  <span class="s2">\</span><span class="f2">#</span>  <span class="s2">/</span>   <span class="s2">\</span><span class="f2">#######</span><span class="s2">\</span> <span class="f2">#######</span>  <span class="s2">|</span><span class="f2">##</span><span class="s2">\</span>
  <span class="s2">\_______|</span> <span class="s2">\______/</span> <span class="s2">\__|\__|</span>  <span class="s2">\__|</span>      <span class="s2">\__|</span> <span class="s2">\__|</span> <span class="s2">\__|</span> <span class="s2">\______/</span>    <span class="s2">\_/</span>     <span class="s2">\_______|\_______/</span> <span class="s2">\__|</span></pre>
-    <p class="lede">Launch a pump.fun coin with rules that watch the real world. When the odds of a ceasefire jump, when an election swings, when SOL breaks a price, when your team wins, when it rains in London, the coin acts: it buys back and burns, pays its holders, or airdrops them. The fees pay for it. Every action is a public transaction.</p>
-    <div class="cta"><a class="btn" href="/launch">launch a coin <span class="k">-&gt;</span></a><a class="br" href="/#try">try a rule on the live world</a></div>
+    <p class="lede">Launch a pump.fun coin and choose the US political party or PAC its fees support. The destination is selected before launch, shown in the token directory, and kept visible as part of the coin’s identity.</p>
+    <div class="cta"><a class="btn" href="/launch">launch a coin <span class="k">-&gt;</span></a><a class="br" href="/#destinations">browse destinations</a></div>
     <div class="ca" id="ca"></div>
   </div>
-  <div class="globe" aria-label="the world, spinning">
-    <pre id="globe" aria-hidden="true"></pre>
-    <div class="pins" id="pins"></div>
+  <div class="globe route-card" aria-label="political fee routing">
+    <pre aria-hidden="true">+----------------------+
+| POLITICAL ROUTE      |
+|                      |
+|  coin launch         |
+|       |              |
+|       v              |
+|  selected party/PAC  |
+|       |              |
+|       v              |
+|  visible fee route   |
++----------------------+</pre>
+    <div class="pins"><div class="pin"><span>destination</span><b>chosen before launch</b></div><div class="pin"><span>disclosure</span><b>token directory</b></div><div class="pin lit"><span>network</span><b>solana</b></div></div>
   </div>
 </section>
 
@@ -87,14 +97,14 @@
 
 <section class="wrap sec rv" id="how">
   <div class="box pipe">
-    <div class="hd"><h2>HOW A RULE FIRES</h2><div class="ctl"><span id="pipeName" class="dim"></span><button class="br sm" type="button" id="pipeP">pause</button></div></div>
+    <div class="hd"><h2>HOW THE FEE ROUTE WORKS</h2><div class="ctl"><span id="pipeName" class="dim"></span><button class="br sm" type="button" id="pipeP">pause</button></div></div>
     <div class="bd">
       <pre id="pipe" aria-hidden="true"></pre>
       <div class="st">
-        <div><span>1</span><b>THE WORLD</b>a source reports something: event odds, a price, a final score, the weather.</div>
-        <div><span>2</span><b>TWO READS</b>a level has to hold on two reads in a row. A game or a post counts once.</div>
-        <div><span>3</span><b>THE CHEST</b>the engine claims the coin’s creator fees into its own wallet: the chest.</div>
-        <div><span>4</span><b>ON-CHAIN</b>it spends the rule’s share of the chest and links the transaction.</div>
+        <div><span>1</span><b>CHOOSE</b>select the US political party or PAC you want attached to the launch.</div>
+        <div><span>2</span><b>DISCLOSE</b>the destination site is stored with the launch and shown on the token directory.</div>
+        <div><span>3</span><b>LAUNCH</b>create the coin on Solana with the destination visible before anyone buys.</div>
+        <div><span>4</span><b>ROUTE</b>the configured fee route points toward the selected political destination.</div>
       </div>
     </div>
   </div>
@@ -162,8 +172,8 @@
   <div class="box">
     <div class="hd"><h2>FAQ</h2></div>
     <div class="bd">
-      <details><summary>What is politic.fun?</summary><div>A pump.fun launchpad where every coin launches with a declared party or PAC destination for its fee route. Rules read world events (war, politics, money: live odds and outcomes from Polymarket), prices, sports results and the weather. Posts on X switch on once the X API key is set. When one fires, the coin’s own fees buy it back and burn it, airdrop it, or pay its holders and creator.</div></details>
-      <details><summary>Where does the money for the actions come from?</summary><div>From the coin’s pump.fun creator fees. The coin’s wallet is its creator, so trading fees build up for it; the engine claims them into the coin’s chest and the rules spend from there. A rule spends a percentage of the chest, never more than is in it.</div></details>
+      <details><summary>What is politic.fun?</summary><div>A pump.fun launchpad where every coin launches with a declared party or PAC destination for its fee route. Rules read world events (war, politics, money: live odds and outcomes from Polymarket), prices, sports results and the weather. Posts on X switch on once the X API key is set. The selected destination is shown with the token so the intended fee route is clear.</div></details>
+      <details><summary>Where does the money for the actions come from?</summary><div>The launch destination selected by the creator. politic.fun keeps the destination visible in the launch metadata and token directory.</div></details>
       <details><summary>Is it custodial?</summary><div>Yes. Each coin’s wallet is derived and held by the politic engine, the same model rulr uses. That is what lets rules run without anyone signing. The engine can only do what the rulebook says, and every action is a public transaction you can check on Solscan. If that isn’t for you, don’t launch here.</div></details>
       <details><summary>What does it cost to launch?</summary><div>Your first buy, about 0.03 SOL of pump.fun rent and fees, and a 0.015 SOL gas reserve that stays in the coin’s wallet. Anything left over after creation goes straight back to you, with your first-buy tokens. If a launch fails, the deposit is returned.</div></details>
       <details><summary>Can a rule fire on old news?</summary><div>No. Rules start watching the moment the coin is live. A game that ended before launch, or a post from yesterday, never counts. Levels like “SOL above $300” have to hold for two reads in a row, and then they fire once per crossing.</div></details>

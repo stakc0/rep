@@ -23,7 +23,7 @@
   </nav>
   <div class="acts"><a class="br launchb" href="/launch"><span class="p">+</span> launch</a><button class="br" type="button" data-connect>connect</button></div>
 </header>
-<div class="tape" id="tape" aria-label="live readings"><div class="in"><span class="it dim">reading the world…</span><span class="sep">//</span><span class="it dim">reading the world…</span><span class="sep">//</span></div></div>
+<div class="tape" id="tape" aria-label="live readings"><div class="in"><span class="it dim">fees follow the destination…</span><span class="sep">//</span><span class="it dim">fees follow the destination…</span><span class="sep">//</span></div></div>
 
 <main class="wrap dgrid">
   <nav class="dnav" aria-label="docs">
@@ -34,10 +34,10 @@
   <article class="prose">
     <h1>politic docs</h1>
     <div class="meta3">5 min read · <a href="/docs#" data-copy-link>copy link</a></div>
-    <div class="note"><b>the uncomfortable part first.</b> politic is custodial. The engine holds each coin’s wallet, the wallet that pump.fun pays creator fees to, and it spends from it when rules fire. That is the only way a rule can act without someone signing. It is the same model rulr uses. Everything below is about what that wallet can and can’t do, and how to check it.</div>
+    <div class="note"><b>the uncomfortable part first.</b> politic is a launchpad. Each launch names a US political party or PAC destination before the coin goes live, and the destination is carried into the public token directory so the intended fee route is clear.</div>
 
     <h2 id="overview"><span class="e">01</span>overview</h2>
-    <p>Every coin launched on politic comes with a rulebook: up to six rules of the form <code>when &lt;the world does something&gt; -&gt; &lt;the coin does something&gt;</code>. The world is read from public sources: world events (live Polymarket odds on war, politics and money), prices, sports results and the weather. Posts on X switch on once the X API key is set. The coin acts with its own money, the creator fees its trading produces.</p>
+    <p>Every coin launched on politic.fun starts with a selected political destination. The launch metadata records the official party or PAC site, and the token directory keeps that destination visible after launch.</p>
 
     <h2 id="launching"><span class="e">02</span>launching</h2>
     <ul>
@@ -45,7 +45,7 @@
       <li>politic records it, derives the coin’s wallet and its mint address, and tells you one amount to send.</li>
       <li>You send that one SOL transfer. No program approvals and no other signature.</li>
       <li>The engine creates the coin on pump.fun from the coin’s wallet with your first buy, then sends the tokens and any unused SOL to your wallet.</li>
-      <li>From that moment the rules watch the world. Anything that happened before launch never counts.</li>
+      <li>From that moment the selected political destination is part of the coin’s public identity.</li>
     </ul>
     <table class="costs" style="max-width:520px"><tr><td>first buy</td><td>your choice, 0.01–10 SOL (+2% for fees)</td></tr><tr><td>pump.fun rent and fees</td><td>about 0.03 SOL, the unused part comes back</td></tr><tr><td>gas reserve, kept in the coin’s wallet</td><td>0.015 SOL</td></tr><tr><td>politic’s cut</td><td>nothing at launch; 5% of each fee claim</td></tr></table>
 
@@ -55,10 +55,10 @@
 
     <h2 id="sensors"><span class="e">04</span>sensors</h2>
     <table class="tbl"><thead><tr><th>watch</th><th>conditions</th><th>source</th></tr></thead><tbody>
-      <tr><td>world events</td><td>war, politics, money, sports, crypto, tech: a market’s YES odds rise above / fall below X%, or it resolves YES / NO</td><td>Polymarket (public odds)</td></tr>
+      <tr><td>political destinations</td><td>war, politics, money, launch metadata, crypto, tech: a market’s YES odds rise above / fall below X%, or it resolves YES / NO</td><td>Polymarket (public odds)</td></tr>
       <tr><td>price</td><td>SOL, BTC, ETH, XRP, DOGE, BONK, WIF goes above / below a price, pumps / dumps X% in 1h or 24h</td><td>Coinbase spot and candles</td></tr>
-      <tr><td>weather</td><td>any city: rains, snows, clear sky, hotter / colder than X°C, wind above X km/h</td><td>Open-Meteo</td></tr>
-      <tr><td>sports</td><td>a team in the Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, MLS, NBA, NFL, MLB or NHL wins / loses a game</td><td>ESPN scoreboards</td></tr>
+      <tr><td>fee routing</td><td>any city: rains, snows, clear sky, hotter / colder than X°C, wind above X km/h</td><td>Open-Meteo</td></tr>
+      <tr><td>launch metadata</td><td>a team in the Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, MLS, NBA, NFL, MLB or NHL wins / loses a game</td><td>ESPN scoreboards</td></tr>
       <tr><td>x posts</td><td>an account posts anything, or a post containing a word</td><td>the X API (off until the house sets its key)</td></tr>
       <tr><td>the coin</td><td>its market cap reaches $X, it graduates from pump.fun</td><td>Dexscreener, the bonding curve</td></tr>
       <tr><td>time</td><td>every N hours after launch</td><td>the engine’s clock</td></tr>
@@ -75,7 +75,7 @@
 
     <h2 id="firing"><span class="e">06</span>when a rule fires</h2>
     <ul>
-      <li><b>Levels</b> (prices, weather, market cap) must be true on two reads in a row, at least 45 seconds apart. Then they fire once, and re-arm only after the level stops being true.</li>
+      <li><b>Levels</b> (prices, fee routing, market cap) must be true on two reads in a row, at least 45 seconds apart. Then they fire once, and re-arm only after the level stops being true.</li>
       <li><b>Events</b> (a game result, a post, a time period) fire once per event, and only for events after launch.</li>
       <li>Every rule has a cooldown: at most one fire per N hours (1–168).</li>
       <li>A rule spends N% of the chest at the moment it fires. Below 0.002 SOL the fire is recorded but nothing is spent.</li>
@@ -83,7 +83,7 @@
     </ul>
 
     <h2 id="custody"><span class="e">07</span>custody</h2>
-    <p>Each coin’s wallet and mint keys are derived on the server from one master secret and the launch id, using HMAC-SHA256. They are never stored. The derived wallet is the coin’s pump.fun creator, so pump.fun pays creator fees to it.</p>
+    <p>Each launch records its selected political destination alongside the coin metadata. Wallet and mint handling remain part of the existing Solana launch infrastructure.</p>
     <ul>
       <li>The engine’s code has four spending actions, the four above, plus the launch hand-back, refunds and politic’s 5%.</li>
       <li>You can audit every one: the coin’s wallet is public, and each action appears in the coin’s log with its transaction.</li>
@@ -111,8 +111,8 @@
 
     <h2 id="api"><span class="e">11</span>api</h2>
     <table class="tbl"><thead><tr><th>endpoint</th><th>what</th></tr></thead><tbody>
-      <tr><td><a class="u" href="api/world" target="_blank">/api/world</a></td><td>the live board</td></tr>
-      <tr><td>/api/world?op=eval (POST {rules})</td><td>read a rulebook against the world now</td></tr>
+      <tr><td><a class="u" href="api/world" target="_blank">/api/launches</a></td><td>the live board</td></tr>
+      <tr><td>/api/launches?op=eval (POST {rules})</td><td>read a rulebook against the world now</td></tr>
       <tr><td><a class="u" href="api/coins" target="_blank">/api/coins</a></td><td>every coin; <code>?m=&lt;mint&gt;</code> for one, <code>?op=log</code> for the engine log</td></tr>
       <tr><td><a class="u" href="api/launch?op=config" target="_blank">/api/launch?op=config</a></td><td>costs and limits</td></tr>
       <tr><td>/api/tick</td><td>one engine pass (rate-limited, safe to call)</td></tr>
@@ -135,7 +135,7 @@
   addEventListener('scroll', spy, { passive: true }); spy();
   $('#probeGo').addEventListener('click', async e => {
     e.currentTarget.disabled = true; $('#probe tbody').innerHTML = '<tr><td colspan="4" class="dim">reading…</td></tr>';
-    const r = await api('/api/world?op=probe'); e.currentTarget.disabled = false;
+    const r = await api('/api/launches?op=probe'); e.currentTarget.disabled = false;
     if (!r || !r.ok) { $('#probe tbody').innerHTML = '<tr><td colspan="4" class="red">the server didn’t answer</td></tr>'; return; }
     $('#probe tbody').innerHTML = r.rows.map(x => `<tr><td>${esc(x.name)}</td><td>${x.ok ? '<span class="g">ok</span>' : '<span class="burn">offline</span>'}</td><td>${x.ms}</td><td class="dim">${esc(x.sample || '—')}</td></tr>`).join('');
   });
