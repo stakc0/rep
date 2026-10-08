@@ -10,7 +10,8 @@ function readBody(req) {
 }
 
 export default async function handler(req, res) {
-  const path = Array.isArray(req.query.path) ? req.query.path.join('/') : String(req.query.path || '');
+  const requestUrl = new URL(req.url || '/', 'http://localhost');
+  const path = requestUrl.pathname.replace(/^\/api\//, '').replace(/\/$/, '');
   if (!['world', 'coins', 'launch', 'tick'].includes(path)) {
     res.status(404).json({ ok: false, error: 'Not found' });
     return;
