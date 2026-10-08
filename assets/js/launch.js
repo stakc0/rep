@@ -50,7 +50,7 @@
   $('#fDev').addEventListener('input', costs); costs();
 
   // ---------- wallet ----------
-  setInterval(() => { const w = WRLD.wallet(); if (w && !$('#fWal').value) $('#fWal').value = w.pk; }, 600);
+  setInterval(() => { const w = WRLD.wallet(); if (w) $('#walletState').textContent = 'connected · ' + short(w.pk); }, 600);
 
   // ---------- launch ----------
   const err = m => { const e = $('#err'); e.textContent = m; e.hidden = !m; if (m) e.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
@@ -113,7 +113,6 @@
     if (!IMG) return err('Add a picture for the coin.');
     if (!/^https:\/\//i.test(domainSite)) return err('Choose a political destination or paste its HTTPS site link.');
     const w = WRLD.wallet() || await WRLD.connect(); if (!w) return err('Connect a Solana wallet first.');
-    if (!$('#fOk').checked) return err('Tick the box to confirm you understand how the engine works.');
     const b = e.currentTarget; b.disabled = true; b.textContent = 'preparing…'; $('#flow').hidden = false; $('#dep').innerHTML = '<div class="msg">uploading metadata and preparing the two Pump V2 transactions…</div>';
     try {
       const image = await (await fetch(IMG)).blob(); const body = new FormData();

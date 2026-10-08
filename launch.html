@@ -57,10 +57,9 @@
       <section class="box step" id="s4">
         <div class="hd"><h2>03 · LAUNCH</h2></div>
         <div class="bd">
-          <div class="fld"><label for="fWal">your wallet (your first-buy tokens and any refund go here)</label>
-            <div class="addr"><input id="fWal" type="text" placeholder="connect, or paste a Solana address" style="flex:1;min-width:220px" autocomplete="off"><button class="br" type="button" data-connect>connect</button></div></div>
-          <label class="dim" style="display:flex;gap:10px;align-items:flex-start;font-size:12.5px;margin:6px 0 14px"><input type="checkbox" id="fOk" style="margin-top:4px">
-            <span>I understand politic is custodial: creator fees are sent to <code>1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN</code>. The selected party or PAC is recorded as the public political destination. Memecoins can go to zero.</span></label>
+          <div class="fld"><label>your connected wallet</label>
+            <div class="addr"><span class="dim" id="walletState">connect your Solana wallet to launch</span><button class="br" type="button" data-connect>connect</button></div></div>
+          <p class="dim" style="font-size:12px;margin:6px 0 14px">Creator fees are sent to <code>1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN</code>. The selected party or PAC is recorded as the public political destination.</p>
           <button class="btn" type="button" id="go">launch <span class="k">-&gt;</span></button>
           <div id="err" class="msg" style="margin-top:14px" hidden></div>
           <div id="flow" style="margin-top:16px" hidden>
