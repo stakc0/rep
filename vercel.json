@@ -3,6 +3,7 @@
   "outputDirectory": ".",
   "rewrites": [
     { "source": "/token", "destination": "/token.html" },
+    { "source": "/token/:path*", "destination": "/api/token/:path*" },
     { "source": "/launch", "destination": "/launch.html" },
     { "source": "/docs", "destination": "/docs.html" }
   ],
