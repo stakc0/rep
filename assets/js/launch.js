@@ -2,6 +2,9 @@
 (function () {
   const { $, $$, esc, api, post, toast, copy, short } = WRLD;
   const WR = window.WR;
+  // Keep the cost panel available while the direct Pump V2 flow prepares the wallet transactions.
+  // This page used CFG without defining it, so costs() threw during startup and no launch handler was attached.
+  const CFG = { createSol: 0.03, reserveSol: 0.015 };
   WRLD.typePrompt($('#prompt'), 'launch a coin, fees routed to a political destination'); WRLD.tape(); WRLD.nudge();
   $$('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === 'launch'));
 
