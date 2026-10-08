@@ -3,8 +3,8 @@
   "outputDirectory": ".",
   "rewrites": [
     {
-      "source": "/:mint([1-9A-HJ-NP-Za-km-z]{32,44})",
-      "destination": "/token.html"
+      "source": "^/([1-9A-HJ-NP-Za-km-z]{32,44})$",
+      "destination": "/token?m=$1"
     },
     {
       "source": "/token",
