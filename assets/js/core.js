@@ -29,19 +29,12 @@
   // ---------- the tape: live readings + the engine's latest actions ----------
   async function tape() {
     const el = $('#tape .in'); if (!el) return;
-    const [b, l] = await Promise.all([api('/api/world'), api('/api/coins?op=log')]);
+    const [p, l] = await Promise.all([api('/api/politics'), api('/api/coins?op=log')]);
     const items = [];
-    if (b && b.ok) {
-      for (const p of b.prices || []) if (p.ok) items.push(`<span class="it"><b>${p.asset}</b> ${usd(p.price)} <span class="${p.ch1h >= 0 ? 'up' : 'dn'}">${pct(p.ch1h)}</span> 1h</span>`);
-      for (const w of b.weather || []) if (w.ok) items.push(`<span class="it"><b>${esc(w.city)}</b> ${w.temp}°C ${esc(w.desc)}</span>`);
-      for (const e of b.events || []) if (e.ok !== false && e.q) items.push(`<span class="it"><b>${esc(e.cat)}</b> ${esc(e.q.slice(0, 70))} <span class="v">YES ${e.yes}%</span></span>`);
-      for (const g of (b.games || []).slice(0, 4)) items.push(`<span class="it"><b>${esc(g.home)}</b> ${esc(g.hs)}–${esc(g.as)} <b>${esc(g.away)}</b> <span class="dim">${esc(g.detail)}</span></span>`);
-    }
-    if (l && l.ok) for (const e of (l.log || []).slice(0, 10)) items.push(`<span class="it"><span class="ar">+&gt;</span> <b>$${esc(e.symbol)}</b> ${esc(e.text.replace(/^rule \d+ fired: /, '').slice(0, 90))}</span>`);
-    if (!items.length) { el.innerHTML = '<span class="it off">the world feeds are offline right now. retrying</span>'.repeat(2); setTimeout(tape, 20000); return; }
-    const one = items.join('<span class="sep">//</span>') + '<span class="sep">//</span>';
-    el.innerHTML = one + one;
-    el.style.animationDuration = Math.max(40, items.length * 6) + 's';
+    if (p && p.ok) for (const n of (p.items || []).slice(0, 8)) items.push(`<span class="it"><b>${esc(n.source)}</b> ${esc(n.title)}</span>`);
+    if (l && l.ok) for (const e of (l.log || []).slice(0, 6)) items.push(`<span class="it"><span class="ar">+&gt;</span> <b>$${esc(e.symbol)}</b> ${esc(e.text.replace(/^rule \d+ fired: /, '').slice(0, 90))}</span>`);
+    if (!items.length) { el.innerHTML = '<span class="it off">political news is offline right now · retrying</span><span class="sep">//</span>'.repeat(2); setTimeout(tape, 20000); return; }
+    const one = items.join('<span class="sep">//</span>') + '<span class="sep">//</span>'; el.innerHTML = one + one; el.style.animationDuration = Math.max(40, items.length * 6) + 's';
   }
 
   // ---------- the spinning world: an orthographic ASCII globe from a 2° land mask ----------
@@ -341,8 +334,8 @@
   // the official-token strip (both states)
   function caStrip(el) {
     if (!el) return;
-    if (CONFIG.ca) el.innerHTML = `<span class="k">$WRLD</span><code>${esc(CONFIG.ca)}</code><span class="r"><a class="br sm" href="#" data-copy="${esc(CONFIG.ca)}" data-what="Contract copied">copy</a><a class="br sm" href="https://pump.fun/coin/${esc(CONFIG.ca)}" target="_blank" rel="noopener">pump.fun</a>${CONFIG.x ? `<a class="br sm" href="${esc(CONFIG.x)}" target="_blank" rel="noopener">x</a>` : ''}</span><span></span><span class="dim">anything else posted as $WRLD is not ours.</span>`;
-    else el.innerHTML = `<span class="k">$WRLD</span><span>The token doesn’t exist yet. Anyone posting a contract address before it appears here is not us.</span>`;
+    if (CONFIG.ca) el.innerHTML = `<span class="k">$POLITIC</span><code>${esc(CONFIG.ca)}</code><span class="r"><a class="br sm" href="#" data-copy="${esc(CONFIG.ca)}" data-what="Contract copied">copy</a><a class="br sm" href="https://pump.fun/coin/${esc(CONFIG.ca)}" target="_blank" rel="noopener">pump.fun</a>${CONFIG.x ? `<a class="br sm" href="${esc(CONFIG.x)}" target="_blank" rel="noopener">x</a>` : ''}</span><span></span><span class="dim">anything else posted as $POLITIC is not ours.</span>`;
+    else el.innerHTML = `<span class="k">$POLITIC</span><span>The token doesn’t exist yet. Anyone posting a contract address before it appears here is not us.</span>`;
   }
 
   api('/api/launch?op=config').then(c => { if (c && c.xApi) window.WRLD_XPOSTS = true; });
