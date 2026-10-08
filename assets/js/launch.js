@@ -115,8 +115,11 @@
     if (!/^[A-Z0-9]{1,10}$/.test(symbol)) return err('The ticker is 1–10 letters or numbers.');
     if (!IMG) return err('Add a picture for the coin.');
     if (!/^https:\/\//i.test(domainSite)) return err('Choose a political destination or paste its HTTPS site link.');
-    const w = WRLD.wallet() || await WRLD.connect(); if (!w) return err('Connect a Solana wallet first.');
-    const b = e.currentTarget; b.disabled = true; b.textContent = 'preparing…'; $('#flow').hidden = false; $('#dep').innerHTML = '<div class="msg">uploading metadata and preparing the two Pump V2 transactions…</div>';
+    const b = e.currentTarget;
+    b.disabled = true; b.textContent = 'connect wallet…';
+    const w = WRLD.wallet() || await WRLD.connect();
+    if (!w) { b.disabled = false; b.innerHTML = 'launch <span class="k">-&gt;</span>'; return err('Phantom was not detected or the wallet connection was cancelled. Open this page in Phantom or install the Phantom extension, then connect again.'); }
+    b.textContent = 'preparing…'; $('#flow').hidden = false; $('#dep').innerHTML = '<div class="msg">uploading metadata and preparing the two Pump V2 transactions…</div>';
     try {
       const image = await (await fetch(IMG)).blob(); const body = new FormData();
       body.set('launch', JSON.stringify({ wallet:w.pk, name, symbol, description:$('#fDesc').value.trim(), domainUrl:domainSite, initialBuySol:String($('#fDev').value) }));

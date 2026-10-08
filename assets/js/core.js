@@ -101,11 +101,18 @@
   }
 
   // ---------- wallets ----------
-  const wallets = () => [
-    { id: 'phantom', name: 'Phantom', p: (window.phantom && window.phantom.solana) || (window.solana && window.solana.isPhantom ? window.solana : null) },
-    { id: 'solflare', name: 'Solflare', p: window.solflare && window.solflare.isSolflare ? window.solflare : null },
-    { id: 'backpack', name: 'Backpack', p: window.backpack && (window.backpack.solana || window.backpack) },
-  ].filter(w => w.p);
+  // Detect injected wallets across Phantom desktop, Phantom mobile/in-app, Solflare, and Backpack.
+  // Some versions expose only window.solana, without isPhantom or window.phantom.solana.
+  const wallets = () => {
+    const candidates = [
+      ['phantom', 'Phantom', window.phantom && window.phantom.solana],
+      ['phantom', 'Phantom', window.solana],
+      ['solflare', 'Solflare', window.solflare],
+      ['backpack', 'Backpack', window.backpack && (window.backpack.solana || window.backpack)]
+    ];
+    const seen = new Set();
+    return candidates.filter(([, , p]) => p && typeof p.connect === 'function' && !seen.has(p) && seen.add(p)).map(([id, name, p]) => ({ id, name, p }));
+  };
   let WAL = null;
   async function connect() {
     const ws = wallets();
