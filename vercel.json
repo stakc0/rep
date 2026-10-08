@@ -1,12 +1,10 @@
 {
   "cleanUrls": true,
   "outputDirectory": ".",
-  "routes": [
-    { "src": "/token(?:/.*)?", "dest": "/token.html" },
-    { "src": "/launch", "dest": "/launch.html" },
-    { "src": "/docs", "dest": "/docs.html" },
-    { "handle": "filesystem" },
-    { "src": "/api/(.*)", "dest": "/api/[...path].js" }
+  "rewrites": [
+    { "source": "/token", "destination": "/token.html" },
+    { "source": "/launch", "destination": "/launch.html" },
+    { "source": "/docs", "destination": "/docs.html" }
   ],
   "headers": [
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
