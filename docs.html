@@ -119,6 +119,14 @@
     </tbody></table>
   </article>
   <aside class="toc"><div class="h">on this page</div><a href="/docs#overview">overview</a><a href="/docs#language">the language</a><a href="/docs#custody">custody</a><a href="/docs#sources">sources, live</a><a href="/docs#failures">failure paths</a><a href="/launch">launch a coin -&gt;</a></aside>
+<section class="wrap sec"><div class="box"><div class="hd"><h2>POLITICAL DATA SURFACES</h2></div><div class="bd"><p class="sub">The home page now uses two lightweight public feeds: political headlines from NYT Politics, Politico, The Hill and BBC, plus live political probabilities from Polymarket. Both panels fail soft when a source is unavailable and retry automatically.</p><div class="code">GET /api/politics
+GET /api/polymarket
+
+# launch metadata website
+https://politic.fun/&lt;mint&gt;
+
+# canonical social
+https://x.com/politicdotfun</div></div></div></section>
 </main>
 <div style="height:60px"></div>
 <script src="assets/js/rules.js"></script>

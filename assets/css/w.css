@@ -330,3 +330,21 @@ html { background-color:var(--paper); background-image:radial-gradient(#353532 1
 .top { background:rgba(27,27,27,.9); }
 .drop { background:var(--paper2)!important; }
 .route-card pre { color: var(--ink); font-size: 12px; line-height: 1.3; font-weight: 600; }
+
+.politics-panel { display: block !important; }
+.news-grid, .odds-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.news-item, .odds-item { display: grid; gap: 10px; padding: 14px; background: var(--paper); text-decoration: none; }
+.news-item { grid-template-columns: 24px 1fr auto; align-items: start; }
+.news-item img { width: 22px; height: 22px; object-fit: contain; filter: grayscale(1); }
+.news-item b, .news-item small, .odds-q { display: block; }
+.news-item b { font-size: 13px; line-height: 1.35; }
+.news-item small { color: var(--mid); font-size: 10px; margin-top: 8px; }
+.news-item em, .odds-item em { color: var(--green2); font-style: normal; font-size: 11px; }
+.news-item:hover, .odds-item:hover { background: var(--paper2); }
+.odds-item { gap: 12px; }
+.odds-q { font-size: 13px; line-height: 1.35; min-height: 36px; }
+.odds-line { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; font: 11px var(--mono); }
+.odds-line b { color: var(--green2); }
+.odds-bar { display: block; height: 5px; background: var(--pale); }
+.odds-bar i { display: block; height: 100%; background: var(--green2); }
+@media(max-width:700px){.news-grid,.odds-grid{grid-template-columns:1fr}}
