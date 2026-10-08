@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/launch", "destination": "/launch.html" },
+    { "source": "/docs", "destination": "/docs.html" },
+    { "source": "/api/:path*", "destination": "https://www.wrlddo.trade/api/:path*" }
+  ],
+  "headers": [
+    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+  ]
+}
