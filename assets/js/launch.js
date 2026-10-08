@@ -2,13 +2,15 @@
 (function () {
   const { $, $$, esc, api, post, sol, hl, toast, copy, short } = WRLD;
   const WR = window.WR;
-  WRLD.typePrompt($('#prompt'), 'launch a coin, wired to the world'); WRLD.tape(); WRLD.nudge();
+  WRLD.typePrompt($('#prompt'), 'launch a coin, wired to a political destination'); WRLD.tape(); WRLD.nudge();
   $$('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === 'launch'));
 
   const DESTINATIONS = [
     ['Democratic Party', 'https://democrats.org', 'D'], ['Republican Party', 'https://gop.com', 'R'],
-    ['America PAC', 'https://theamericapac.org', 'A'], ['Fairshake', 'https://www.fairshakepac.com', 'F'],
-    ['American Blockchain PAC', 'https://americanblockchainpac.org', 'B'], ['Defend Developers PAC', 'https://defenddeveloperspac.org', 'D'],
+    ['Fairshake', 'https://www.fairshakepac.com', 'F'], ['Sentinel Action Fund', 'https://sentinelactionfund.com', 'S'],
+    ['Protect Progress', 'https://protectprogresspac.com', 'P'], ['Future Forward', 'https://futureforwardusa.org', 'F'],
+    ['NRCC', 'https://www.nrcc.org', 'N'], ['Defend American Jobs', 'https://defendamericanjobs.com', 'D'],
+    ['America PAC', 'https://theamericapac.org', 'A'], ['American Blockchain PAC', 'https://americanblockchainpac.org', 'B'],
     ['End Citizens United', 'https://endcitizensunited.org', 'E'], ['Club for Growth', 'https://clubforgrowth.org', 'C'],
     ['Working Families Party', 'https://workingfamilies.org', 'W'], ['Libertarian Party', 'https://lp.org', 'L']
   ];

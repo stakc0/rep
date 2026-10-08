@@ -321,3 +321,11 @@ body { position: relative; }
 @keyframes paper { to { background-position: 32px 32px; } }
 html { animation: paper 40s linear infinite; }
 @media (prefers-reduced-motion: reduce) { html { animation: none; } }
+
+/* politic.fun political register: grey-first inversion, one red signal accent */
+:root { --paper:#1b1b1b; --paper2:#242424; --grid:#303030; --ink:#e4e4df; --ink2:#b7b7b1; --mid:#92928c; --mute:#70706b; --pale:#555550; --line:#41413d; --green:#bcbcb5; --green2:#d5d5ce; --green3:#ededE7; --violet:#a0a0a0; --burn:#db5a4e; --hold:#aaa; --air:#aaa; --crea:#c9c9c1; --chest:#c7c7c0; --red:#e15b50; }
+html { background-color:var(--paper); background-image:radial-gradient(#353532 1px,transparent 1px); background-size:32px 32px; }
+.logo img { width:30px; height:30px; object-fit:cover; image-rendering:pixelated; filter:grayscale(1); }
+.box, .btn::before { background:var(--paper2); }
+.top { background:rgba(27,27,27,.9); }
+.drop { background:var(--paper2)!important; }

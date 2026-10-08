@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f6f3ec">
-<link rel="icon" href="assets/img/fav32.png" sizes="32x32"><link rel="icon" href="assets/img/fav64.png" sizes="64x64"><link rel="apple-touch-icon" href="assets/img/fav180.png">
+<meta name="theme-color" content="#1b1b1b">
+<link rel="icon" href="assets/img/politic-logo.png" type="image/png">
 <meta property="og:type" content="website"><meta property="og:site_name" content="politic"><meta property="og:image" content="https://politic-fun.vercel.app/assets/img/og.jpg">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://politic-fun.vercel.app/assets/img/og.jpg">
 <link rel="preload" href="assets/fonts/jbm.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/w.css">
-<script>window.WRLD_CONFIG = { ca: 'Ebugdjc8mh84WakL8n4cd1nnuAW2R2beeTiZoBK5pump', x: 'https://x.com/politicpad' };</script>
+<script>window.WRLD_CONFIG = { ca: 'Ebugdjc8mh84WakL8n4cd1nnuAW2R2beeTiZoBK5pump', x: 'https://x.com/politicdotfun' };</script>
 
 <title>politic · launch</title>
-<meta name="description" content="Launch a pump.fun coin with a rulebook wired to the world.">
+<meta name="description" content="Launch a pump.fun coin with a declared political destination and visible fee route.">
 <meta property="og:title" content="politic · launch a coin wired to the world">
 </head>
 <body data-page="launch">
 <header class="top">
-  <a class="logo" href="/" aria-label="politic home"><span class="wn">politic<i>_</i></span></a>
+  <a class="logo" href="/" aria-label="politic home"><img src="assets/img/politic-logo.png" alt=""><span class="wn">politic<i>_</i></span></a>
   <nav class="nav" aria-label="main">
     <a href="/" data-nav="home">home</a><a href="/launch" data-nav="launch">launch</a><a href="/#coins" data-nav="coins">coins</a><a href="/#engine" data-nav="how">how it works</a><a href="/docs" data-nav="docs">docs</a>
   </nav>
@@ -26,7 +26,7 @@
 <div class="tape" id="tape" aria-label="live readings"><div class="in"><span class="it dim">reading the world…</span><span class="sep">//</span><span class="it dim">reading the world…</span><span class="sep">//</span></div></div>
 
 <main class="wrap">
-  <div class="prompt" id="prompt" style="margin-top:28px"><span class="gt">&gt;</span>launch a coin, wired to the world<span class="cur u"></span></div>
+  <div class="prompt" id="prompt" style="margin-top:28px"><span class="gt">&gt;</span>launch a coin, wired to a political destination<span class="cur u"></span></div>
   <div class="lgrid">
     <div>
       <section class="box step" id="s1">
@@ -39,15 +39,15 @@
           <div class="fld"><label for="fDesc">description (pump.fun shows it; the rulebook line is added after it)</label><textarea id="fDesc" maxlength="500" placeholder="what the coin is about"></textarea></div>
           <div class="pic"><label class="drop" id="drop" for="fImg" tabindex="0">+ picture<br>png · jpg · gif</label><input id="fImg" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
             <div class="dim" style="font-size:12px">square works best. it is cropped to 512×512.</div></div>
-          <div class="fld"><label for="fWeb">fee destination site</label><input id="fWeb" type="url" placeholder="https://official-party-or-pac.org" required></div>
-          <div class="box" style="margin-top:14px;background:var(--paper2)"><div class="hd"><h2>CHOOSE A POLITICAL DESTINATION</h2><div class="ctl"><span>official public sites · verify before launch</span></div></div><div class="bd"><div id="partyGrid" class="chips"></div><p class="dim" style="font-size:12px;margin-top:10px">The selected site identifies the intended party or PAC destination. The token metadata always remains on politic.fun/token/&lt;mint&gt;.</p></div></div>
+          <div class="fld"><label for="fWeb">political destination site</label><input id="fWeb" type="url" placeholder="https://official-party-or-pac.org" required></div>
+          <div class="box" style="margin-top:14px;background:var(--paper2)"><div class="hd"><h2>CHOOSE A POLITICAL DESTINATION</h2><div class="ctl"><span>official public sites · verify before launch</span></div></div><div class="bd"><div id="partyGrid" class="chips"></div><p class="dim" style="font-size:12px;margin-top:10px">The selected site identifies the intended party or PAC destination. The destination stays in the launch metadata and token directory. The token metadata always remains on politic.fun/token/&lt;mint&gt;.</p></div></div>
         </div>
       </section>
 
       <section class="box step" id="s2">
         <div class="hd"><h2>02 · THE RULEBOOK</h2><div class="ctl"><span id="rCount"></span></div></div>
         <div class="bd">
-          <p class="sub">Up to 6 rules. Each one watches the world and spends a share of the coin’s chest (its claimed creator fees) when it fires. Start from a rulebook or write your own.</p>
+          <p class="sub">Up to 6 rules. Each one watches a political signal and spends a share of the coin’s chest (its claimed creator fees) when it fires. Start from a campaign starter or write your own.</p>
           <div class="chips" id="tchips"></div>
           <div id="rules"></div>
           <div class="cta" style="margin-top:12px"><button class="br" type="button" id="addRule"><span class="p">+</span> add a rule</button><button class="br" type="button" id="evalAll">read them against the world now</button></div>
