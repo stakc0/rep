@@ -100,6 +100,13 @@ function xOAuthHeader(method, url, query) {
   const base = [method.toUpperCase(), oauthEncode(url), oauthEncode(params)].join('&'); const key = `${oauthEncode(consumerSecret)}&${oauthEncode(accessSecret)}`; oauth.oauth_signature = crypto.createHmac('sha1', key).update(base).digest('base64');
   return `OAuth ${Object.entries(oauth).map(([k, v]) => `${oauthEncode(k)}="${oauthEncode(v)}"`).join(', ')}`;
 }
+async function xProfiles(usernames) {
+  const handles = [...new Set(usernames.map(value => String(value || '').replace(/^@/, '').trim()).filter(value => /^[A-Za-z0-9_]{1,15}$/.test(value)))].slice(0, 100); if (!handles.length) return [];
+  const token = process.env.X_BEARER_TOKEN || process.env.TWITTER_BEARER_TOKEN || ''; const u = new URL('https://api.x.com/2/users/by'); u.searchParams.set('usernames', handles.join(',')); u.searchParams.set('user.fields', 'profile_image_url,public_metrics,description,name,username,verified,created_at');
+  const oauth = xOAuthHeader('GET', u.origin + u.pathname, Object.fromEntries(u.searchParams)); const headers = { accept: 'application/json' }; if (oauth) headers.authorization = oauth; else if (token) headers.authorization = `Bearer ${token}`; else throw Object.assign(new Error('X identity linking is not configured.'), { status: 503 });
+  const r = await fetch(u, { headers, signal: AbortSignal.timeout(15000) }); const data = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(data.detail || data.title || `X returned ${r.status}`), { status: r.status === 429 ? 429 : 502 });
+  return (data.data || []).map(x => ({ x_user_id: x.id, x_handle: x.username, x_name: x.name, display_name: x.name, x_avatar_url: x.profile_image_url || null, avatar_url: x.profile_image_url || null, x_bio: x.description || null, bio: x.description || null, x_followers: Number(x.public_metrics?.followers_count || 0), x_verified: Boolean(x.verified), x_created_at: x.created_at || null, x_url: `https://x.com/${x.username}`, identity_source: 'x_api', x_linked_at: new Date().toISOString() }));
+}
 async function xProfile(username) {
   const token = process.env.X_BEARER_TOKEN || process.env.TWITTER_BEARER_TOKEN || '';
   const handle = String(username || '').replace(/^@/, '').trim().slice(0, 15); if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) throw Object.assign(new Error('Enter a valid X username.'), { status: 400 });
@@ -178,6 +185,13 @@ async function kolscanIdentity(wallet) {
   if (!row) return null;
   return { display_name: row.name || null, avatar_url: row.avatar || null, x_url: row.twitter || null, x_handle: row.twitter?.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1] || null, identity_source: 'kolscan' };
 }
+async function indexXProfiles() {
+  const rows = await kolscanLeaderboard(); const handles = rows.map(row => row.twitter?.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1]).filter(Boolean); let indexed = 0; let failed = null;
+  for (let i = 0; i < handles.length; i += 100) {
+    try { const profiles = await xProfiles(handles.slice(i, i + 100)); for (const profile of profiles) { const row = rows.find(item => item.twitter?.toLowerCase().endsWith(`/${profile.x_handle.toLowerCase()}`)); if (!row) continue; await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, ...profile, updated_at: new Date().toISOString() }) }).catch(() => null); await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, display_name: profile.display_name, avatar_url: profile.avatar_url, profile: { source: 'x_api', x_followers: profile.x_followers, x_verified: profile.x_verified } }) }).catch(() => null); indexed++; } } catch (error) { failed = error.message; break; }
+  }
+  return { source: 'x_api', candidates: handles.length, indexed, failed };
+}
 async function indexKolscan() {
   const rows = await kolscanLeaderboard();
   let indexed = 0;
@@ -232,6 +246,7 @@ export default async function handler(req, res) {
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
     if (path === 'kolscan' && req.method === 'GET') { const wallets = await kolscanLeaderboard(); res.setHeader('cache-control', 'public, s-maxage=60, stale-while-revalidate=300'); return res.status(200).json({ ok: true, source: 'kolscan', wallets, indexedAt: kolscanCache.at, cacheAgeMs: Date.now() - kolscanCache.at }); }
     if (path === 'index/kolscan' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexKolscan()) });
+    if (path === 'index/x-profiles' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexXProfiles()) });
     if (path === 'wallet' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('address'));
       res.setHeader('cache-control', 'public, s-maxage=20, stale-while-revalidate=60');
