@@ -2,14 +2,14 @@
   const $ = s => document.querySelector(s);
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const short = v => v ? `${v.slice(0,6)}…${v.slice(-5)}` : 'unknown';
-  const verified = '<img class="verified-check" src="/assets/img/verified-check.png" alt="verified" title="identity indexed">';
+  const verified = '<img class="verified-check" src="/assets/img/verified-check.png" alt="verified" title="X identity indexed">';
   let wallets = [];
   const stars = r => { const p = Math.max(0, Number(r.profit || 0)); const n = Math.max(3, Math.min(5, Math.round(3 + Math.log10(p + 1) / 2))); return '★'.repeat(n) + '☆'.repeat(5 - n); };
   const avatar = r => r.avatar ? `<img src="${esc(r.avatar)}" alt="" loading="lazy">` : `<span class="wallet-fallback">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
   function render() {
     const q = ($('#walletSearch')?.value || '').toLowerCase().trim();
     const rows = wallets.filter(r => `${r.name || ''} ${r.twitter || ''} ${r.wallet || ''}`.toLowerCase().includes(q));
-    $('#walletDirectory').innerHTML = rows.length ? rows.map((r, i) => `<a class="rank-card" href="/token?wallet=${encodeURIComponent(r.wallet)}"><span class="rank-number">${String(i + 1).padStart(2, '0')}</span>${avatar(r)}<span class="rank-identity"><b>${esc(r.name || 'unnamed wallet')} ${verified}</b><small>${r.twitter ? `@${esc(r.twitter.split('/').pop())}` : short(r.wallet)}</small><small>${short(r.wallet)}</small></span><span class="rank-rep"><strong>${stars(r)}</strong><small>REP rating</small></span><span class="rank-warning"><b>0</b><small>warnings</small></span><span class="rank-open">view profile</span></a>`).join('') : '<div class="empty-state">No wallet matches that search.</div>';
+    $('#walletDirectory').innerHTML = rows.length ? rows.map((r, i) => `<a class="rank-card" href="/token?wallet=${encodeURIComponent(r.wallet)}"><span class="rank-number">${String(i + 1).padStart(2, '0')}</span>${avatar(r)}<span class="rank-identity"><b>${esc(r.name || 'unnamed wallet')} ${r.x_verified ? verified : ''}</b><small>${r.twitter ? `@${esc(r.twitter.split('/').pop())}` : short(r.wallet)}</small><small>${short(r.wallet)}</small></span><span class="rank-rep"><strong>${stars(r)}</strong><small>REP rating</small></span><span class="rank-warning"><b>0</b><small>warnings</small></span><span class="rank-open">view profile</span></a>`).join('') : '<div class="empty-state">No wallet matches that search.</div>';
     $('#walletCount').textContent = wallets.length;
     $('#searchCount').textContent = q ? `${rows.length} matches` : 'all wallets';
   }
