@@ -1,25 +1,11 @@
 (() => {
-  const $ = selector => document.querySelector(selector);
-  const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-  const short = value => value ? `${value.slice(0, 6)}…${value.slice(-5)}` : 'unknown';
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const short = v => v ? `${v.slice(0,6)}…${v.slice(-5)}` : 'unknown';
   let wallets = [];
-  function card(row, index) {
-    const x = row.twitter ? `<a class="wallet-social" href="${esc(row.twitter)}" target="_blank" rel="noopener">X ↗</a>` : '<span class="dim">no X linked</span>';
-    const avatar = row.avatar ? `<img src="${esc(row.avatar)}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<span class="wallet-avatar-fallback">${esc((row.name || 'W').slice(0, 1).toUpperCase())}</span>`;
-    const pnl = Number(row.profit || 0);
-    return `<a class="wallet-row" href="/token?wallet=${encodeURIComponent(row.wallet)}"><span class="wallet-rank">${String(index + 1).padStart(2, '0')}</span><span class="wallet-person">${avatar}<span><b>${esc(row.name || 'unnamed wallet')}</b><small>${short(row.wallet)}</small></span></span><span class="wallet-x">${x}</span><span class="wallet-pnl ${pnl >= 0 ? 'up' : 'dn'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} SOL</span><span class="wallet-open">view REP ↗</span></a>`;
-  }
-  function render() {
-    const query = ($('#indexSearch')?.value || '').toLowerCase().trim();
-    const shown = wallets.filter(row => `${row.name || ''} ${row.twitter || ''} ${row.wallet || ''}`.toLowerCase().includes(query));
-    $('#walletIndex').innerHTML = shown.length ? shown.map(card).join('') : '<div class="empty">No wallets match that filter.</div>';
-    $('#indexStatus').textContent = `${wallets.length} wallets indexed · ${shown.length} shown`;
-  }
-  async function load() {
-    $('#indexStatus').textContent = 'refreshing index…';
-    try { const response = await fetch('/api/kolscan', { cache: 'no-store' }); const data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || 'Index unavailable'); wallets = data.wallets || []; render(); } catch (error) { $('#indexStatus').textContent = 'index unavailable'; $('#walletIndex').innerHTML = `<div class="empty">${esc(error.message)}</div>`; }
-  }
-  $('#indexSearch')?.addEventListener('input', render);
-  $('#indexRefresh')?.addEventListener('click', load);
-  load(); setInterval(load, 60000);
+  const avatar = (r, cls='') => r.avatar ? `<img class="${cls}" src="${esc(r.avatar)}" alt="" loading="lazy">` : `<span class="${cls || 'wallet-fallback'}">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
+  function renderDirectory() { const q = ($('#walletSearch')?.value || '').toLowerCase().trim(); const rows = wallets.filter(r => `${r.name || ''} ${r.twitter || ''} ${r.wallet || ''}`.toLowerCase().includes(q)); $('#walletDirectory').innerHTML = rows.length ? rows.map(r => `<a class="wallet-card" href="/token?wallet=${encodeURIComponent(r.wallet)}">${avatar(r)}<span><b>${esc(r.name || 'unnamed wallet')}</b><small>${short(r.wallet)} · ${r.twitter ? `<span class="x">@${esc(r.twitter.split('/').pop())}</span>` : 'identity not linked'}</small></span><span class="pnl">${Number(r.profit || 0) >= 0 ? '+' : ''}${Number(r.profit || 0).toFixed(2)}<small>SOL PNL</small></span></a>`).join('') : '<div class="empty-state">No wallet matches that identity.</div>'; $('#walletCount').textContent = wallets.length || '—'; }
+  function renderBoard() { const rows = wallets.slice().sort((a,b) => Number(b.profit || 0) - Number(a.profit || 0)).slice(0,6); $('#topWallets').innerHTML = rows.length ? rows.map(r => `<a class="top-wallet" href="/token?wallet=${encodeURIComponent(r.wallet)}">${avatar(r,'top-fallback')}<span><b>${esc(r.name || 'unnamed')}</b><small>${short(r.wallet)}</small></span><em>${Number(r.profit || 0) >= 0 ? '+' : ''}${Number(r.profit || 0).toFixed(0)} SOL</em></a>`).join('') : '<div class="empty-state">No indexed wallets yet.</div>'; }
+  async function load() { try { const res = await fetch('/api/kolscan',{cache:'no-store'}); const data = await res.json(); if (!res.ok || !data.ok) throw Error(data.error || 'index unavailable'); wallets = data.wallets || []; renderDirectory(); renderBoard(); } catch (e) { $('#walletDirectory').innerHTML = '<div class="empty-state">The wallet index is temporarily offline. Try again shortly.</div>'; $('#topWallets').innerHTML = '<div class="empty-state">Index offline.</div>'; } }
+  $('#walletSearch')?.addEventListener('input', renderDirectory); load(); setInterval(load, 60000);
 })();
