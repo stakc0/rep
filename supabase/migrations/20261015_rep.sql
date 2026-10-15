@@ -74,11 +74,13 @@ create table if not exists public.rep_reviews (
   wallet text not null references public.rep_wallets(wallet) on delete cascade,
   author_wallet text,
   category text not null default 'observation',
+  rating smallint not null default 3 check (rating between 1 and 5),
   text text not null check (char_length(text) between 12 and 1200),
   evidence_url text,
   created_at timestamptz not null default now()
 );
 
+alter table public.rep_reviews add column if not exists rating smallint not null default 3;
 create index if not exists rep_reviews_wallet_created_idx on public.rep_reviews(wallet, created_at desc);
 
 create table if not exists public.rep_wallet_links (

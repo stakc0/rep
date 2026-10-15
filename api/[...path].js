@@ -147,7 +147,7 @@ function scoreWallet({ performance, reviews = [] }) {
   const pnl = Number(p.total_pnl ?? p.realized_pnl ?? p.realizedPnl ?? p.metrics?.total_pnl ?? 0);
   const trades = Number(p.total_trades ?? p.trade_count ?? p.metrics?.total_trades ?? 0);
   const warnings = reviews.filter(r => ['warning', 'exploitative', 'scam', 'abuse', 'investigation'].includes(String(r.category || '').toLowerCase())).length;
-  const positive = reviews.filter(r => ['positive', 'reliable', 'helpful', 'praise'].includes(String(r.category || '').toLowerCase())).length;
+  const positive = reviews.filter(r => ['positive', 'reliable', 'helpful', 'praise'].includes(String(r.category || '').toLowerCase()) || Number(r.rating || 0) >= 4).length;
   const base = Math.round(Math.min(55, Math.max(0, winRate * .55)) + Math.min(25, Math.max(0, Math.log10(Math.max(1, Math.abs(pnl) + 1)) * 8)) + Math.min(15, trades / 20) + Math.min(10, positive * 2) - Math.min(35, warnings * 7));
   const total = Math.max(0, Math.min(100, base));
   return { score: total, grade: total >= 85 ? 'A+' : total >= 75 ? 'A' : total >= 65 ? 'B+' : total >= 52 ? 'B' : total >= 38 ? 'C' : 'D', indicators: { winRate, pnl, trades, warnings, positive } };
@@ -272,12 +272,11 @@ export default async function handler(req, res) {
     }
     if (path === 'reviews' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
-      const wallet = validWallet(body.wallet); const category = String(body.category || 'observation').slice(0, 40); const text = String(body.text || '').trim().slice(0, 1200); const authorWallet = body.author_wallet ? validWallet(body.author_wallet) : null;
+      const wallet = validWallet(body.wallet); const category = ['positive', 'warning', 'observation'].includes(String(body.category || '')) ? String(body.category) : 'observation'; const rating = Math.max(1, Math.min(5, Number(body.rating || 3))); const text = String(body.text || '').trim().slice(0, 1200); const authorWallet = body.author_wallet ? validWallet(body.author_wallet) : null;
       if (text.length < 12) throw Object.assign(new Error('Review must contain at least 12 characters.'), { status: 400 });
-      if (!SUPABASE_URL || !SUPABASE_KEY) throw Object.assign(new Error('Review database is not configured.'), { status: 503 });
-      const rows = await supabase('rep_reviews', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ wallet, author_wallet: authorWallet, category, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null }) });
+      const rows = await supabase('rep_reviews', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ wallet, author_wallet: authorWallet, category, rating, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null }) });
       walletMemoryCache.delete(wallet);
-      return res.status(201).json({ ok: true, review: rows?.[0] || null });
+      return res.status(201).json({ ok: true, review: rows?.[0] || { wallet, category, rating, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null, created_at: new Date().toISOString(), stored: Boolean(rows?.[0]) } });
     }
     if (path === 'links' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('wallet')); const links = (await supabase(`rep_wallet_links?or=(main_wallet.eq.${encodeURIComponent(wallet)},linked_wallet.eq.${encodeURIComponent(wallet)})&select=*&order=created_at.desc&limit=50`)) || [];
