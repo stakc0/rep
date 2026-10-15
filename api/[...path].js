@@ -1,5 +1,6 @@
 import { directPrepare, directConfirm, listLaunches } from '../launch-direct.mjs';
 import { PublicKey } from '@solana/web3.js';
+import crypto from 'node:crypto';
 
 export const config = { api: { bodyParser: false } };
 
@@ -90,12 +91,21 @@ async function cielo(path, params = {}) {
   if (!r.ok) throw Object.assign(new Error(data.message || `Cielo returned ${r.status}`), { status: r.status });
   return data;
 }
+function oauthEncode(value) { return encodeURIComponent(String(value)).replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16).toUpperCase()}`); }
+function xOAuthHeader(method, url, query) {
+  const consumerKey = process.env.X_CONSUMER_KEY || ''; const consumerSecret = process.env.X_CONSUMER_SECRET || ''; const accessToken = process.env.X_ACCESS_TOKEN || ''; const accessSecret = process.env.X_ACCESS_TOKEN_SECRET || '';
+  if (!consumerKey || !consumerSecret || !accessToken || !accessSecret) return null;
+  const oauth = { oauth_consumer_key: consumerKey, oauth_nonce: crypto.randomBytes(16).toString('hex'), oauth_signature_method: 'HMAC-SHA1', oauth_timestamp: Math.floor(Date.now() / 1000), oauth_token: accessToken, oauth_version: '1.0' };
+  const params = [...Object.entries(query), ...Object.entries(oauth)].sort(([a, av], [b, bv]) => oauthEncode(a).localeCompare(oauthEncode(b)) || oauthEncode(av).localeCompare(oauthEncode(bv))).map(([k, v]) => `${oauthEncode(k)}=${oauthEncode(v)}`).join('&');
+  const base = [method.toUpperCase(), oauthEncode(url), oauthEncode(params)].join('&'); const key = `${oauthEncode(consumerSecret)}&${oauthEncode(accessSecret)}`; oauth.oauth_signature = crypto.createHmac('sha1', key).update(base).digest('base64');
+  return `OAuth ${Object.entries(oauth).map(([k, v]) => `${oauthEncode(k)}="${oauthEncode(v)}"`).join(', ')}`;
+}
 async function xProfile(username) {
   const token = process.env.X_BEARER_TOKEN || process.env.TWITTER_BEARER_TOKEN || '';
-  if (!token) throw Object.assign(new Error('X identity linking is not configured.'), { status: 503 });
-  const handle = String(username || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) throw Object.assign(new Error('Enter a valid X username.'), { status: 400 });
-  const u = new URL(`https://api.x.com/2/users/by/username/${encodeURIComponent(handle)}`); u.searchParams.set('user.fields', 'profile_image_url,public_metrics,description,name,username,verified,created_at');
-  const r = await fetch(u, { headers: { authorization: `Bearer ${token}`, accept: 'application/json' }, signal: AbortSignal.timeout(10000) }); const data = await r.json().catch(() => ({}));
+  const handle = String(username || '').replace(/^@/, '').trim().slice(0, 15); if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) throw Object.assign(new Error('Enter a valid X username.'), { status: 400 });
+  const u = new URL(`https://api.x.com/2/users/by/username/${encodeURIComponent(handle)}`); const fields = 'profile_image_url,public_metrics,description,name,username,verified,created_at'; u.searchParams.set('user.fields', fields);
+  const oauth = xOAuthHeader('GET', u.origin + u.pathname, Object.fromEntries(u.searchParams)); const headers = { accept: 'application/json' }; if (oauth) headers.authorization = oauth; else if (token) headers.authorization = `Bearer ${token}`; else throw Object.assign(new Error('X identity linking is not configured.'), { status: 503 });
+  const r = await fetch(u, { headers, signal: AbortSignal.timeout(10000) }); const data = await r.json().catch(() => ({}));
   if (!r.ok || !data.data) throw Object.assign(new Error(data.detail || data.title || `X returned ${r.status}`), { status: r.status === 404 ? 404 : 502 });
   const x = data.data; return { x_user_id: x.id, x_handle: x.username, x_name: x.name, display_name: x.name, x_avatar_url: x.profile_image_url || null, avatar_url: x.profile_image_url || null, x_bio: x.description || null, bio: x.description || null, x_followers: Number(x.public_metrics?.followers_count || 0), x_verified: Boolean(x.verified), x_created_at: x.created_at || null, x_url: `https://x.com/${x.username}`, identity_source: 'x_api', x_linked_at: new Date().toISOString() };
 }
