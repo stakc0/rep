@@ -141,7 +141,7 @@ async function kolscanLeaderboard() {
   const accounts = /wallet_address\\":\\"([1-9A-HJ-NP-Za-km-z]{32,44})/g;
   let match;
   while ((match = accounts.exec(html))) {
-    const wallet = match[1]; const chunk = html.slice(match.index, match.index + 1800).replaceAll('\\"', '"'); const name = stripHtml((chunk.match(/"name":"(.*?)","telegram"/) || [])[1] || ''); const avatar = (html.match(new RegExp(`https://kolscan-images.pump.fun/profiles/${wallet}/[^" ]+`)) || [])[0]?.replaceAll('\\\\', '') || '';
+    const wallet = match[1]; const chunk = html.slice(match.index, match.index + 1800).replaceAll('\\"', '"'); const name = stripHtml((chunk.match(/"name":"(.*?)","telegram"/) || [])[1] || '').split('","pfp"')[0]; const avatar = (html.match(new RegExp(`https://kolscan-images.pump.fun/profiles/${wallet}/[^" ]+`)) || [])[0]?.replaceAll('\\\\', '') || '';
     const marker = `wallet_address\\":\\"${wallet}`; const dataPos = html.indexOf(marker); const dataChunk = dataPos >= 0 ? html.slice(dataPos, dataPos + 1800).replaceAll('\\"', '"') : ''; const xPos = dataChunk.indexOf('"twitter":"'); const xEnd = xPos >= 0 ? dataChunk.indexOf('"', xPos + 11) : -1; const twitter = xPos >= 0 && xEnd > xPos ? dataChunk.slice(xPos + 11, xEnd) : '';
     const profit = Number(dataChunk.match(/\"profit\":(-?[0-9.]+)/)?.[1] || 0);
     wallets.set(wallet, { wallet, name, avatar, twitter, profit, source: 'kolscan' });
