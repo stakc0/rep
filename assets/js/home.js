@@ -5,7 +5,7 @@
   const verified = '<img class="verified-check" src="/assets/img/verified-check.png" alt="verified" title="X identity indexed">';
   let wallets = []; let voteCounts = {};
   const score = r => { const state = voteState(r.wallet); const up = Number(r.votes_up || state.up || 0); const down = Number(r.votes_down || state.down || 0); const total = up + down; return total ? Math.round((up / total) * 100) : 50; };
-  const avatar = r => r.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(r.avatar)}" alt="" loading="lazy">` : `<span class="wallet-fallback">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
+  const avatar = r => r.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(String(r.avatar).replace(/\\+$/, ''))}" alt="" loading="lazy">` : `<span class="wallet-fallback">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
   function voteState(wallet) { try { return { ...(voteCounts[wallet] || {}), ...JSON.parse(localStorage.getItem(`rep-vote:${wallet}`) || '{}') }; } catch { return voteCounts[wallet] || {}; } }
   function render() {
     const q = ($('#walletSearch')?.value || '').toLowerCase().trim();
