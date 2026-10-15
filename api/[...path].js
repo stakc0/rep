@@ -73,6 +73,8 @@ const CIELO_BASE = 'https://feed-api.cielo.finance/api/v1';
 const SUPABASE_URL = process.env.DEFAULT_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.DEFAULT_SUPABASE_ACCESS_TOKEN || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const SVS_RPC = process.env.SVS_RPC_HTTPS_ENDPOINT || process.env.PUMP_RPC_URL || 'https://api.mainnet-beta.solana.com';
+const walletMemoryCache = new Map();
+const CACHE_TTL_MS = 45_000;
 
 function validWallet(value) {
   try { return new PublicKey(String(value || '')).toBase58(); } catch { throw Object.assign(new Error('Enter a valid Solana wallet address.'), { status: 400 }); }
@@ -97,6 +99,20 @@ async function supabase(path, options = {}) {
   if (!r.ok) throw new Error(`Supabase returned ${r.status}`);
   return r.status === 204 ? null : r.json();
 }
+async function cachedWalletRow(wallet) {
+  const rows = await supabase(`rep_wallets?wallet=eq.${encodeURIComponent(wallet)}&select=*`).catch(() => null);
+  return Array.isArray(rows) ? rows[0] || null : null;
+}
+async function cachedProfile(wallet) {
+  const memory = walletMemoryCache.get(wallet);
+  if (memory && Date.now() - memory.cachedAt < CACHE_TTL_MS) return memory.profile;
+  const row = await cachedWalletRow(wallet);
+  if (!row?.transactions || !row.last_seen_at || Date.now() - Date.parse(row.last_seen_at) >= CACHE_TTL_MS) return null;
+  const reviews = (await supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => [])) || [];
+  const profile = { ...row.profile, wallet, score: row.score, grade: row.grade, indicators: row.indicators || {}, balanceSol: Number(row.last_balance_sol || 0), transactions: row.transactions || [], performance: row.performance || null, reviews, indexedAt: Date.parse(row.last_seen_at) };
+  walletMemoryCache.set(wallet, { cachedAt: Date.now(), profile });
+  return profile;
+}
 function scoreWallet({ performance, reviews = [] }) {
   const p = performance?.data || performance || {};
   const winRate = Number(p.win_rate ?? p.winRate ?? p.metrics?.win_rate ?? 0);
@@ -113,6 +129,8 @@ function normalizeTx(item) {
   return { signature: x?.tx_hash || x?.signature || x?.hash || x?.transaction_hash || '', type: x?.tx_type || x?.type || x?.event_type || 'activity', token: x?.token_symbol || x?.token?.symbol || x?.token_name || '', valueUsd: Number(x?.value_usd || x?.amount_usd || x?.value || 0), timestamp: x?.timestamp || x?.block_timestamp || x?.datetime || null, source: 'cielo' };
 }
 async function walletProfile(wallet) {
+  const cached = await cachedProfile(wallet);
+  if (cached) return cached;
   const [portfolio, feed, performance, reviews, balance] = await Promise.all([
     cielo(`${wallet}/portfolio`).catch(() => null),
     cielo('feed', { wallet, chains: 'solana', limit: 5 }).catch(() => null),
@@ -125,8 +143,12 @@ async function walletProfile(wallet) {
   const sol = balance?.value != null ? Number(balance.value) / 1e9 : Number(portfolioData.native_balance || portfolioData.sol_balance || 0);
   const txs = feedItems.slice(0, 5).map(normalizeTx);
   const rep = scoreWallet({ performance, reviews: reviews || [] });
-  const profile = { wallet, balanceSol: sol, portfolioUsd: Number(portfolioData.total_usd_value || 0), transactions: txs, performance: performance?.data || performance || null, score: rep.score, grade: rep.grade, indicators: rep.indicators, reviews: reviews || [], indexedAt: Date.now() };
-  await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet, score: rep.score, grade: rep.grade, indicators: rep.indicators, last_balance_sol: sol, last_seen_at: new Date().toISOString() }) }).catch(() => null);
+  const indexedAt = new Date().toISOString();
+  const profile = { wallet, balanceSol: sol, portfolioUsd: Number(portfolioData.total_usd_value || 0), transactions: txs, performance: performance?.data || performance || null, score: rep.score, grade: rep.grade, indicators: rep.indicators, reviews: reviews || [], indexedAt: Date.parse(indexedAt) };
+  walletMemoryCache.set(wallet, { cachedAt: Date.now(), profile });
+  await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet, score: rep.score, grade: rep.grade, indicators: rep.indicators, last_balance_sol: sol, performance: profile.performance, transactions: txs, profile: { portfolioUsd: profile.portfolioUsd }, last_seen_at: indexedAt, updated_at: indexedAt }) }).catch(() => null);
+  await supabase('rep_score_events', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ wallet, score: rep.score, grade: rep.grade, indicators: rep.indicators, reason: 'index_refresh' }) }).catch(() => null);
+  if (txs.length) await supabase('rep_wallet_transactions', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(txs.map(tx => ({ wallet, signature: tx.signature || `${wallet}:${tx.timestamp || Date.now()}`, payload: tx, observed_at: indexedAt }))) }).catch(() => null);
   return profile;
 }
 
@@ -151,6 +173,18 @@ export default async function handler(req, res) {
       res.setHeader('cache-control', 'public, s-maxage=20, stale-while-revalidate=60');
       return res.status(200).json({ ok: true, ...(await walletProfile(wallet)) });
     }
+    if (path === 'profile' && req.method === 'GET') {
+      const wallet = validWallet(requestUrl.searchParams.get('wallet'));
+      return res.status(200).json({ ok: true, profile: (await supabase(`rep_profiles?wallet=eq.${encodeURIComponent(wallet)}&select=*`).catch(() => []))?.[0] || null });
+    }
+    if (path === 'profile' && req.method === 'POST') {
+      const body = JSON.parse((await readBody(req)).toString() || '{}');
+      const wallet = validWallet(body.wallet); const handle = String(body.x_handle || '').replace(/^@/, '').trim().slice(0, 64); const displayName = String(body.display_name || '').trim().slice(0, 80); const bio = String(body.bio || '').trim().slice(0, 500);
+      if (!handle && !displayName) throw Object.assign(new Error('Add an X handle or display name.'), { status: 400 });
+      await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet }) });
+      const rows = await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ wallet, x_handle: handle || null, display_name: displayName || null, bio: bio || null, updated_at: new Date().toISOString() }) });
+      return res.status(200).json({ ok: true, profile: rows?.[0] || null });
+    }
     if (path === 'reviews' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('wallet'));
       return res.status(200).json({ ok: true, reviews: (await supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`)) || [] });
@@ -161,6 +195,7 @@ export default async function handler(req, res) {
       if (text.length < 12) throw Object.assign(new Error('Review must contain at least 12 characters.'), { status: 400 });
       if (!SUPABASE_URL || !SUPABASE_KEY) throw Object.assign(new Error('Review database is not configured.'), { status: 503 });
       const rows = await supabase('rep_reviews', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ wallet, author_wallet: authorWallet, category, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null }) });
+      walletMemoryCache.delete(wallet);
       return res.status(201).json({ ok: true, review: rows?.[0] || null });
     }
     if (!['world', 'coins', 'launch', 'tick'].includes(path)) return res.status(404).json({ ok: false, error: 'Not found' });
