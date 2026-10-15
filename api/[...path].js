@@ -76,6 +76,7 @@ const SUPABASE_KEY = process.env.DEFAULT_SUPABASE_ACCESS_TOKEN || process.env.SU
 const SVS_RPC = process.env.SVS_RPC_HTTPS_ENDPOINT || process.env.PUMP_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const walletMemoryCache = new Map();
 const kolscanCache = { at: 0, wallets: [], staleAt: 0 };
+const reviewMemory = new Map();
 const CACHE_TTL_MS = 45_000;
 const KOLSCAN_TTL_MS = 60_000;
 
@@ -136,7 +137,7 @@ async function cachedProfile(wallet) {
   if (memory && Date.now() - memory.cachedAt < CACHE_TTL_MS) return memory.profile;
   const row = await cachedWalletRow(wallet);
   if (!row?.transactions || !row.last_seen_at || Date.now() - Date.parse(row.last_seen_at) >= CACHE_TTL_MS) return null;
-  const reviews = (await supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => [])) || [];
+  const reviews = (await supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => null)) || reviewMemory.get(wallet) || [];
   const profile = { ...row.profile, wallet, score: row.score, grade: row.grade, indicators: row.indicators || {}, balanceSol: Number(row.last_balance_sol || 0), transactions: row.transactions || [], performance: row.performance || null, reviews, indexedAt: Date.parse(row.last_seen_at) };
   walletMemoryCache.set(wallet, { cachedAt: Date.now(), profile });
   return profile;
@@ -210,7 +211,7 @@ async function walletProfile(wallet) {
     cielo(`${wallet}/portfolio`).catch(() => null),
     cielo('feed', { wallet, chains: 'solana', limit: 5 }).catch(() => null),
     cielo(`${wallet}/enhanced-stats/profitability-performance`, { days: 'max' }).catch(() => null),
-    supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => []),
+    supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => reviewMemory.get(wallet) || []),
     rpc('getBalance', [wallet, { commitment: 'confirmed' }]).catch(() => null),
     kolscanIdentity(wallet),
   ]);
@@ -267,16 +268,16 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, profile: rows?.[0] || { wallet, ...identity } });
     }
     if (path === 'reviews' && req.method === 'GET') {
-      const walletParam = requestUrl.searchParams.get('wallet'); const query = walletParam ? `rep_reviews?wallet=eq.${encodeURIComponent(validWallet(walletParam))}&select=*&order=created_at.desc&limit=50` : 'rep_reviews?select=*&order=created_at.desc&limit=50';
-      return res.status(200).json({ ok: true, reviews: (await supabase(query)) || [] });
+      const walletParam = requestUrl.searchParams.get('wallet'); const wallet = walletParam ? validWallet(walletParam) : null; const query = wallet ? `rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50` : 'rep_reviews?select=*&order=created_at.desc&limit=50'; const stored = await supabase(query).catch(() => null); const local = wallet ? (reviewMemory.get(wallet) || []) : [...reviewMemory.values()].flat();
+      return res.status(200).json({ ok: true, reviews: stored || local });
     }
     if (path === 'reviews' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
       const wallet = validWallet(body.wallet); const category = ['positive', 'warning', 'observation'].includes(String(body.category || '')) ? String(body.category) : 'observation'; const rating = Math.max(1, Math.min(5, Number(body.rating || 3))); const text = String(body.text || '').trim().slice(0, 1200); const authorWallet = body.author_wallet ? validWallet(body.author_wallet) : null;
       if (text.length < 12) throw Object.assign(new Error('Review must contain at least 12 characters.'), { status: 400 });
-      const rows = await supabase('rep_reviews', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ wallet, author_wallet: authorWallet, category, rating, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null }) });
-      walletMemoryCache.delete(wallet);
-      return res.status(201).json({ ok: true, review: rows?.[0] || { wallet, category, rating, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null, created_at: new Date().toISOString(), stored: Boolean(rows?.[0]) } });
+      const review = { wallet, author_wallet: authorWallet, category, rating, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null, created_at: new Date().toISOString() }; const rows = await supabase('rep_reviews', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(review) }).catch(() => null);
+      if (!rows?.[0]) reviewMemory.set(wallet, [review, ...(reviewMemory.get(wallet) || [])].slice(0, 50)); walletMemoryCache.delete(wallet);
+      return res.status(201).json({ ok: true, review: rows?.[0] || { ...review, stored: false } });
     }
     if (path === 'links' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('wallet')); const links = (await supabase(`rep_wallet_links?or=(main_wallet.eq.${encodeURIComponent(wallet)},linked_wallet.eq.${encodeURIComponent(wallet)})&select=*&order=created_at.desc&limit=50`)) || [];
