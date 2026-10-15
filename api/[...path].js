@@ -246,7 +246,7 @@ export default async function handler(req, res) {
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
     if (path === 'kolscan' && req.method === 'GET') { const wallets = await kolscanLeaderboard(); res.setHeader('cache-control', 'public, s-maxage=60, stale-while-revalidate=300'); return res.status(200).json({ ok: true, source: 'kolscan', wallets, indexedAt: kolscanCache.at, cacheAgeMs: Date.now() - kolscanCache.at }); }
     if (path === 'index/kolscan' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexKolscan()) });
-    if (path === 'index/x-profiles' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexXProfiles()) });
+    if ((path === 'index/x-profiles' || path === 'x-profiles-index') && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexXProfiles()) });
     if (path === 'wallet' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('address'));
       res.setHeader('cache-control', 'public, s-maxage=20, stale-while-revalidate=60');
