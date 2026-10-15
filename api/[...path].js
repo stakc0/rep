@@ -113,7 +113,7 @@ async function xProfile(username) {
   const u = new URL(`https://api.x.com/2/users/by/username/${encodeURIComponent(handle)}`); const fields = 'profile_image_url,public_metrics,description,name,username,verified,created_at'; u.searchParams.set('user.fields', fields);
   const oauth = xOAuthHeader('GET', u.origin + u.pathname, Object.fromEntries(u.searchParams)); const headers = { accept: 'application/json' }; if (oauth) headers.authorization = oauth; else if (token) headers.authorization = `Bearer ${token}`; else throw Object.assign(new Error('X identity linking is not configured.'), { status: 503 });
   const r = await fetch(u, { headers, signal: AbortSignal.timeout(10000) }); const data = await r.json().catch(() => ({}));
-  if (!r.ok || !data.data) throw Object.assign(new Error(data.detail || data.title || `X returned ${r.status}`), { status: r.status === 404 ? 404 : 502 });
+  if (!r.ok || !data.data) throw Object.assign(new Error(data.detail || data.title || data.errors?.[0]?.detail || (r.ok ? 'X profile not found.' : `X returned ${r.status}`)), { status: r.status === 404 ? 404 : 502 });
   const x = data.data; return { x_user_id: x.id, x_handle: x.username, x_name: x.name, display_name: x.name, x_avatar_url: x.profile_image_url || null, avatar_url: x.profile_image_url || null, x_bio: x.description || null, bio: x.description || null, x_followers: Number(x.public_metrics?.followers_count || 0), x_verified: Boolean(x.verified), x_created_at: x.created_at || null, x_url: `https://x.com/${x.username}`, identity_source: 'x_api', x_linked_at: new Date().toISOString() };
 }
 async function rpc(method, params) {
