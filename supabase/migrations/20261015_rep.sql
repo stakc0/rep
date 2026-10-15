@@ -1,3 +1,9 @@
+create table if not exists public.rep_site_config (
+  key text primary key,
+  ends_at timestamptz,
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.rep_wallets (
   wallet text primary key,
   display_name text,
