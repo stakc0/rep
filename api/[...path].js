@@ -138,10 +138,10 @@ async function kolscanLeaderboard() {
     const r = await fetch('https://kolscan.io/leaderboard', { headers: { 'user-agent': 'REP reputation index/1.0', accept: 'text/html' }, signal: AbortSignal.timeout(20000) });
     if (!r.ok) throw Object.assign(new Error(`Kolscan returned ${r.status}`), { status: 502 });
     const html = await r.text(); const wallets = new Map();
-  const accounts = /href="\/account\/([1-9A-HJ-NP-Za-km-z]{32,44})\?timeframe=1"/g;
+  const accounts = /wallet_address\\":\\"([1-9A-HJ-NP-Za-km-z]{32,44})/g;
   let match;
   while ((match = accounts.exec(html))) {
-    const wallet = match[1]; const chunk = html.slice(match.index, match.index + 2600); const name = stripHtml((chunk.match(/<h1[^>]*>(.*?)<\/h1>/) || [])[1] || ''); const avatar = (chunk.match(/https:\/\/kolscan-images\.pump\.fun\/profiles\/[^" ]+/) || [])[0] || '';
+    const wallet = match[1]; const chunk = html.slice(match.index, match.index + 1800).replaceAll('\\"', '"'); const name = stripHtml((chunk.match(/"name":"(.*?)","telegram"/) || [])[1] || ''); const avatar = (html.match(new RegExp(`https://kolscan-images\\\\.pump\\\\.fun/profiles/${wallet}/[^"\\\\ ]+`)) || [])[0] || '';
     const marker = `wallet_address\\":\\"${wallet}`; const dataPos = html.indexOf(marker); const dataChunk = dataPos >= 0 ? html.slice(dataPos, dataPos + 1800).replaceAll('\\"', '"') : ''; const xPos = dataChunk.indexOf('"twitter":"'); const xEnd = xPos >= 0 ? dataChunk.indexOf('"', xPos + 11) : -1; const twitter = xPos >= 0 && xEnd > xPos ? dataChunk.slice(xPos + 11, xEnd) : '';
     const profit = Number(dataChunk.match(/\"profit\":(-?[0-9.]+)/)?.[1] || 0);
     wallets.set(wallet, { wallet, name, avatar, twitter, profit, source: 'kolscan' });
