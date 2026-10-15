@@ -57,134 +57,28 @@
   </div>
 </section>
 
-<section class="wrap sec rv" id="live">
+
+<section class="wrap sec rv" id="directory">
   <div class="box">
-    <div class="hd"><h2>WALLET SIGNALS, LIVE</h2><div class="ctl"><span id="liveAt" class="livedot">reading…</span><button class="br sm" type="button" id="liveRe">read now</button></div></div>
+    <div class="hd"><h2>REP WALLET INDEX</h2><div class="ctl"><span id="indexStatus">loading indexed wallets…</span><button class="br sm" type="button" id="indexRefresh">refresh</button></div></div>
     <div class="bd">
-      <p class="sub">These are the readings the engine acts on, straight from the sources. Every profile is built from public activity and community evidence.</p>
-      <div class="cols">
-        <div><div class="k3">price · coinbase</div><div id="lvPx"><div class="row"><span class="dim">reading…</span></div></div></div>
-        <div><div class="k3">weather · open-meteo</div><div id="lvWx"><div class="row"><span class="dim">reading…</span></div></div></div>
-        <div><div class="k3">sports · espn</div><div id="lvGm"><div class="row"><span class="dim">reading…</span></div></div></div>
-        <div><div class="k3">wallet behavior · performance · community signals</div><div id="lvEv"><div class="row"><span class="dim">reading…</span></div></div></div>
-      </div>
+      <p class="sub">Every wallet we know about, displayed with the person behind it. PFP, X identity, observed PNL, wins, losses, and a public REP profile.</p>
+      <div class="index-tools"><label class="index-search"><span>&gt;</span><input id="indexSearch" type="search" placeholder="filter the full index by name, X, or wallet"></label><span class="dim">ALL INDEXED WALLETS</span></div>
+      <div id="walletIndex" class="wallet-index"><div class="empty">reading Kolscan index…</div></div>
     </div>
-    <div class="foot"><span>sources: <a href="https://www.coinbase.com/price/solana" target="_blank" rel="noopener">coinbase</a> · <a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo</a> · <a href="https://www.espn.com" target="_blank" rel="noopener">espn</a> · <a href="https://polymarket.com" target="_blank" rel="noopener">polymarket</a> · x posts once the X API key is set</span><span id="liveNext"></span></div>
   </div>
 </section>
-
-<section class="wrap sec rv" id="events">
-  <div class="box">
-    <div class="hd"><h2>WALLET PROFILES</h2><div class="ctl"><span>live wallet signals · inspect the evidence</span></div></div>
-    <div class="bd">
-      <div class="chips" id="evTabs"></div>
-      <div id="evList"><div class="empty">reading the odds…</div></div>
-    </div>
-    <div class="foot"><span>a rule can fire when an event’s YES odds rise above or fall below a level, or when it resolves YES or NO</span><span id="evAt"></span></div>
-  </div>
-</section>
-
-<section class="wrap sec rv" id="destinations"><div class="box"><div class="hd"><h2>WALLET PROFILES</h2><div class="ctl"><span>find the people behind the wallets</span></div></div><div class="bd"><p class="sub">Every wallet has a history. REP gives it context: performance, behavior, reviews, and warnings from the people who were there.</p><div class="dest-grid"><a href="/token?wallet=11111111111111111111111111111111"><b>mistergreen</b><span> A+ · +184.2 SOL · 42 reviews</span></a><a href="/token?wallet=11111111111111111111111111111111"><b>quietsize</b><span> B+ · +91.8 SOL · consistent entries</span></a><a href="/token?wallet=11111111111111111111111111111111"><b>solsniper</b><span> C · +28.1 SOL · 67 reviews</span></a><a href="/token?wallet=11111111111111111111111111111111"><b>fastlane</b><span> D− · 12 warnings · high risk</span></a><a href="/token?wallet=11111111111111111111111111111111"><b>earlybird</b><span> A · clean history · 26 reviews</span></a><a href="/token?wallet=11111111111111111111111111111111"><b>0xpatient</b><span> B · long-term holder · 14 reviews</span></a></div></div></div></section>
-
-<section class="wrap sec rv politics-panel" id="politics"><div class="box"><div class="hd"><h2>COMMUNITY SIGNALS</h2><div class="ctl"><span id="politicsAt" class="dim">reading sources…</span><button class="br sm" type="button" id="politicsRe">refresh</button></div></div><div class="bd"><div id="politicsNews" class="news-grid"><div class="empty">loading reputation desks…</div></div></div><div class="foot"><span>NYT · POLITICO · THE HILL · BBC</span><span>source links open original reporting</span></div></div></section>
-
-<section class="wrap sec rv politics-panel" id="odds"><div class="box"><div class="hd"><h2>REPUTATION · EVIDENCE</h2><div class="ctl"><span id="oddsAt" class="dim">reading markets…</span><a class="br sm" href="https://polymarket.com" target="_blank" rel="noopener">open ↗</a></div></div><div class="bd"><div id="politicsOdds" class="odds-grid"><div class="empty">loading reputation markets…</div></div></div><div class="foot"><span>live public market probabilities</span><span>not financial advice</span></div></div></section>
-
 <section class="wrap sec rv" id="how">
-  <div class="box pipe">
-    <div class="hd"><h2>HOW REP WORKS</h2><div class="ctl"><span id="pipeName" class="dim"></span><button class="br sm" type="button" id="pipeP">pause</button></div></div>
-    <div class="bd">
-      <pre id="pipe" aria-hidden="true"></pre>
-      <div class="st">
-        <div><span>1</span><b>CHOOSE</b>look up a wallet and inspect its history before you follow it.</div>
-        <div><span>2</span><b>DISCLOSE</b>reviews and receipts are stored with the profile and shown in the public index.</div>
-        <div><span>3</span><b>LAUNCH</b>read on-chain performance and community notes before you copy a position.</div>
-        <div><span>4</span><b>ROUTE</b>good traders leave receipts; bad actors leave warnings.</div>
-      </div>
-    </div>
+  <div class="box">
+    <div class="hd"><h2>HOW REP WORKS</h2><div class="ctl"><span>reputation is the most valuable currency in crypto</span></div></div>
+    <div class="bd"><div class="rep-principles"><div><span>01</span><b>INDEX</b><p>Wallets, names, X accounts, PFPs, and public trading records live together instead of being scattered across tabs.</p></div><div><span>02</span><b>SCORE</b><p>REP is built from observable performance, behavior, evidence, and community signals. No black-box number.</p></div><div><span>03</span><b>REMEMBER</b><p>Reviews and warnings stay attached to the wallet so nobody has to repeat the same mistake twice.</p></div></div></div>
   </div>
 </section>
-
-<section class="wrap sec rv" id="try">
-  <div class="box">
-    <div class="hd"><h2>TRY A RULE</h2><div class="ctl"><span>nothing launches from here</span></div></div>
-    <div class="bd">
-      <p class="sub">Write one rule and check it against the world as it is right now. The engine asks this same question every few minutes for every live coin.</p>
-      <div id="tryEd"></div>
-      <div class="code" id="tryCode" style="margin-top:12px"></div>
-      <div class="cta" style="margin-top:14px"><button class="btn" type="button" id="tryGo">read the world <span class="k">-&gt;</span></button><a class="br" id="tryUse" href="/#destinations">submit a review with this rule</a></div>
-      <div class="verdict" id="tryOut" hidden></div>
-    </div>
-  </div>
-</section>
-
-<section class="wrap sec rv" id="rulebooks">
-  <div class="box">
-    <div class="hd"><h2>CAMPAIGN STARTERS</h2><div class="ctl"><span>start from one, change anything</span></div></div>
-    <div class="bd"><div class="tpls" id="tpls"></div></div>
-  </div>
-</section>
-
-
-<section class="wrap sec rv" id="coins">
-  <div class="box">
-    <div class="hd"><h2>WALLETS ON REP</h2><div class="ctl"><span id="coinsN"></span><a class="br sm" href="/launch">+ launch</a></div></div>
-    <div class="bd" id="coinsBd"><div class="empty">reading the registry…</div></div>
-  </div>
-</section>
-
-<section class="wrap sec rv" id="fired">
-  <div class="box">
-    <div class="hd"><h2>FIRED</h2><div class="ctl"><span>every claim, fire and payout, with its transaction</span></div></div>
-    <div class="bd"><div class="feed" id="feed"><div class="empty">reading the engine log…</div></div></div>
-  </div>
-</section>
-
-<section class="wrap sec rv" id="engine">
-  <div class="box">
-    <div class="hd"><h2>THE ROUTE</h2><div class="ctl"><a class="br sm" href="/docs#custody">read the details</a></div></div>
-    <div class="bd">
-      <p class="sub">REP is a public reputation layer. It does not ask you to trust a leaderboard. It shows the evidence, the pattern, and what the community has reported about a wallet.</p>
-      <div class="cant">
-        <div><div class="h">it cannot</div></div><div><div class="h">so it</div></div>
-        <div>sell the coin. There is no sell action in the code.</div><div>only ever buys, burns, airdrops and pays out.</div>
-        <div>change a rulebook after launch.</div><div>prints the rulebook’s fingerprint in the coin’s pump.fun description.</div>
-        <div>act on a guess. If a source doesn’t answer, the rule waits.</div><div>links the reading and the transaction for every fire.</div>
-        <div>move a coin’s SOL anywhere the rules don’t name.</div><div>keeps a small reserve for gas; the rest is the chest.</div>
-      </div>
-      <div class="facts">
-        <div><b>5%</b><span>REP index of each fee claim (rulr takes 10%)</span></div>
-        <div><b id="stTick">~5 min</b><span id="stTickL">between engine passes; visits wake it sooner</span></div>
-        <div><b>2 reads</b><span>a level must hold twice before it fires</span></div>
-        <div><b id="stLive">—</b><span>wallets indexed on REP right now</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="wrap sec rv" id="faq">
-  <div class="box">
-    <div class="hd"><h2>FAQ</h2></div>
-    <div class="bd">
-      <details><summary>What is REP?</summary><div>REP is a public index for pump.fun wallets and traders. It helps people review performance, recognize consistency, and warn others about exploitative behavior before they copy it. Rules read world events (war, signals, money: live odds and outcomes from Polymarket), prices, sports results and the weather. Posts on X switch on once the X API key is set. The wallet profile stays visible so the next trader can make an informed decision.</div></details>
-      <details><summary>Where does the money for the actions come from?</summary><div>A wallet profile is created from public activity and community context. Reviews should be specific, evidence-linked, and open to challenge.</div></details>
-      <details><summary>Is it custodial?</summary><div>Yes. Each coin’s wallet is derived and held by the REP index, the same model rulr uses. That is what lets rules run without anyone signing. The engine can only do what the rulebook says, and every action is a public transaction you can check on Solscan. If that isn’t for you, don’t launch here.</div></details>
-      <details><summary>What does it cost to launch?</summary><div>Your first buy, about 0.03 SOL of pump.fun rent and fees, and a 0.015 SOL gas reserve that stays in the coin’s wallet. Anything left over after creation goes straight back to you, with your first-buy tokens. If a launch fails, the deposit is returned.</div></details>
-      <details><summary>Can a rule fire on old news?</summary><div>No. Rules start watching the moment the coin is live. A game that ended before launch, or a post from yesterday, never counts. Levels like “SOL above $300” have to hold for two reads in a row, and then they fire once per crossing.</div></details>
-      <details><summary>What if a source is down?</summary><div>The rule waits and the coin’s page says the source is offline. The engine never acts on a missing reading.</div></details>
-      <details><summary>Who holds what?</summary><div>Holders are read from the chain: the largest token accounts, minus the bonding curve, pools and the coin’s own wallet. Up to 20 get paid, pro rata to their bags.</div></details>
-    </div>
-  </div>
+<section class="wrap sec rv" id="standards">
+  <div class="box"><div class="hd"><h2>REP STANDARDS</h2><div class="ctl"><span>specific claims · visible evidence · open challenge</span></div></div><div class="bd"><div class="cant"><div>what REP shows</div><div>what REP does not pretend</div><div>on-chain activity, wallet performance, identity context, reviews, and warnings.</div><div>a perfect prediction of character or future results.</div><div>who made a claim and what evidence they attached.</div><div>anonymous vibes disguised as certainty.</div></div></div></div>
 </section>
 </main>
-
-
-
-<script>window.WRLD_ART = {"land": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHwAfvAAAAAAAAAAAAAAAAAAAAAAAAx37///+AAAAAGoABAAAAAAAAAAAAAIe8P///wAA8AAAAAA0AAAAAAAAAAAwADw////4AAIAAAAAAHAAAAAAAAAAALivwAf//wAAAAADAAP/wAHIAAAAAADsj38AH/+gAAAAAEAH///OAAAAgBgAAfw3/gB/+gAAAgAMHe///+/9gBAP/7/nbdrwD/+AAAH/Ag7H////////8H//////g8H/gAAAf/6//f////////Mf/////9H4D4A+AA+ev///////////AP/////4A0B4AAAD5/////////////Af1////gHgA4AAAP5///////////LwAHgD///gH0AAAAAG4/////////+AMAABAC///4D+AAAAGCx/////////4A4AAAAB////n/gAAAOCR/////////4A4AAAAAf///3/wAAAbH//////////9AgAAAAAP/////gAAADf//////////9AAAAAAAF////0YAAAB///////////8AAAAAAAD////8EAAAB///v///////5AAAAAAAD////+AAAAB/f5f///////wAAAAAAAD////gAAAAfxnwP///////jgAAAAAAD///+AAAAAPCb3///////+AAAAAAAAD///8AAAAAfCJf//////+ECAAAAAAAB///8AAAAAGDRf///////mMAAAAAAAA///8AAAAAH+Ai///////E8AAAAAAAAf//wAAAAAP/AA///////BgAAAAAAAAP//gAAAAAf/73///////gAAAAAAAAAD/AQAAAAAf//9/f/////gAAAAAAAAAF+AQAAAAB///+/n/////AAAAAAAAAAC+AAAAAAB///+fwH///+AAAAAAAAAAAeAwAAAAD////f/D///8gAAAAAAAAAAeGEAAAAD////v+B/j/AAAAAAAAAAAAPMAwAAAD////n+AfB+gAAAAAAAAAAAD8AAAAAD////34AeBfAgAAAAAAAAAAAPAAAAAH////3gAcAfAgAAAAAAAAAAADAAAAAD////6AAcAfgwAAAAAAAAAAABBwAAAD////8wAMATAIAAAAAAAAAAAAr/AAAB/////gAIASAAAAAAAAAAAAAAH/gAAA/////gACAAAIAAAAAAAAAAAAH/8AAAYH///AAAAsGAAAAAAAAAAAAAH/+AAAAB//+AAAAUOAAAAAAAAAAAAAP/+AAAAB//8AAAAc+gAAAAAAAAAAAAP//gAAAD//4AAAAMeBgAAAAAAAAAAAP//8AAAB//wAAAAGdCuAAAAAAAAAAAf///AAAA//wAAAACAAHgAAAAAAAAAAP///gAAA//wAAAAB4AHggAAAAAAAAAH///AAAAf/wAAAAACIDQIAAAAAAAAAH//+AAAAf/wAAAAAAAAAAAAAAAAAAAD//+AAAA//wgAAAAABxAAAAAAAAAAAD//8AAAA//wgAAAAAHxgBAAAAAAAAAA//8AAAA//zgAAAAAf/gAAAAAAAAAAAf/8AAAA//DgAAAAAf/gAAAAAAAAAAAf/8AAAAf/DAAAAAD//4CAAAAAAAAAAf/wAAAAf/DAAAAAH//4AAAAAAAAAAAf/AAAAAf+DAAAAAH//8AAAAAAAAAAAf/AAAAAP8AAAAAAH//+AAAAAAAAAAA/+AAAAAP8AAAAAAH//+AAAAAAAAAAA/8AAAAAH4AAAAAAD//+AAAAAAAAAAA/8AAAAAHwAAAAAADwf8AAAAAAAAAAA/gAAAAAAAAAAAAACAP4AAAAAAAAAAB/wAAAAAAAAAAAAAAAD4AEAAAAAAAAB+AAAAAAAAAAAAAAAAAAAGAAAAAAAAB6AAAAAAAAAAAAAAAAAwAMAAAAAAAAA8AAAAAAAAAAAAAAAAAQAYAAAAAAAAB4AAAAAAAAAAAAAAAAAAAwAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAACAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAA8AAf/8d/AAAAAAAAAAAAkAAAAAAACP/+H//////AAAAAAAAAAA+AAAAIf////+////////AAAAAAAOMKPAAAB///////////////gAAAH/8D//8AAAH//////////////4AAAF/////8AAAP///////////////4AAIf/////gwBwf///////////////4AAAH//////AAD////////////////wAAA///////+f//////////////////A/wH///////////////////////////////////////////////////////////////////////////////////////", "land_w": 180, "land_h": 90};</script>
-<script src="assets/js/rules.js"></script>
 <script src="assets/js/core.js"></script>
 <script src="assets/js/home.js"></script>
-<script src="assets/js/registry.js"></script>
-<script src="assets/js/politics.js"></script>
 </body>
 </html>
