@@ -1,0 +1,9 @@
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const short = v => v ? `${v.slice(0,6)}…${v.slice(-5)}` : 'unknown wallet';
+  const icon = r => r.account?.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(String(r.account.avatar).replace(/\\+$/, ''))}" onerror="this.onerror=null;this.src='/assets/img/fav32.png'" alt="">` : `<span>${esc((r.account?.name || r.wallet || 'W').slice(0,1).toUpperCase())}</span>`;
+  function render(reviews) { $('#reviewTotal').textContent = `${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}`; $('#feed').innerHTML = reviews.length ? reviews.map(r => `<article class="feed-review"><div class="feed-avatar">${icon(r)}</div><div class="feed-main"><div class="feed-meta"><span class="tag ${esc(r.category || 'observation')}">${esc(r.category || 'observation')}</span><span class="review-stars">${'★'.repeat(Number(r.rating || 0))}${'☆'.repeat(Math.max(0,5-Number(r.rating || 0)))}</span><time>${r.created_at ? new Date(r.created_at).toLocaleString() : 'just now'}</time></div><p>${esc(r.text)}</p><div class="feed-account"><b>${esc(r.account?.name || short(r.wallet))}</b>${r.account?.x_handle ? `<span>@${esc(r.account.x_handle)}</span>` : ''}<a href="/token?wallet=${encodeURIComponent(r.wallet)}">${short(r.wallet)} ↗</a></div>${r.evidence_url ? `<a class="u" href="${esc(r.evidence_url)}" target="_blank" rel="noopener">open evidence ↗</a>` : ''}</div></article>`).join('') : '<div class="empty-state">No reviews logged yet.</div>'; }
+  async function refresh() { try { const res = await fetch(`/api/reviews?feed=1&t=${Date.now()}`, { cache:'no-store' }); const data = await res.json(); if (!res.ok || !data.ok) throw Error(); render(data.reviews || []); $('#live').classList.add('on'); } catch { $('#live').classList.remove('on'); } }
+  refresh(); setInterval(refresh, 5000);
+})();

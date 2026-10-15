@@ -273,8 +273,8 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, profile: rows?.[0] || { wallet, ...identity } });
     }
     if (path === 'reviews' && req.method === 'GET') {
-      const walletParam = requestUrl.searchParams.get('wallet'); const wallet = walletParam ? validWallet(walletParam) : null; const query = wallet ? `rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50` : 'rep_reviews?select=*&order=created_at.desc&limit=50'; const stored = await supabase(query).catch(() => null); const local = wallet ? (reviewMemory.get(wallet) || []) : [...reviewMemory.values()].flat();
-      return res.status(200).json({ ok: true, reviews: stored || local });
+      const walletParam = requestUrl.searchParams.get('wallet'); const wallet = walletParam ? validWallet(walletParam) : null; const query = wallet ? `rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50` : 'rep_reviews?select=*&order=created_at.desc&limit=100'; const stored = await supabase(query).catch(() => null); const reviews = stored || (wallet ? (reviewMemory.get(wallet) || []) : [...reviewMemory.values()].flat()); const accounts = await supabase('rep_wallets?select=wallet,display_name,avatar_url,profile&limit=1000').catch(() => []); const byWallet = Object.fromEntries((accounts || []).map(row => [row.wallet, { name: row.display_name || row.profile?.x_name || row.profile?.display_name || null, avatar: row.avatar_url || row.profile?.x_avatar_url || null, x_handle: row.profile?.x_handle || null }]));
+      return res.status(200).json({ ok: true, reviews: reviews.map(review => ({ ...review, account: byWallet[review.wallet] || null })) });
     }
     if (path === 'reviews' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
