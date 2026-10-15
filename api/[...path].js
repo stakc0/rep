@@ -90,6 +90,15 @@ async function cielo(path, params = {}) {
   if (!r.ok) throw Object.assign(new Error(data.message || `Cielo returned ${r.status}`), { status: r.status });
   return data;
 }
+async function xProfile(username) {
+  const token = process.env.X_BEARER_TOKEN || process.env.TWITTER_BEARER_TOKEN || '';
+  if (!token) throw Object.assign(new Error('X identity linking is not configured.'), { status: 503 });
+  const handle = String(username || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) throw Object.assign(new Error('Enter a valid X username.'), { status: 400 });
+  const u = new URL(`https://api.x.com/2/users/by/username/${encodeURIComponent(handle)}`); u.searchParams.set('user.fields', 'profile_image_url,public_metrics,description,name,username,verified,created_at');
+  const r = await fetch(u, { headers: { authorization: `Bearer ${token}`, accept: 'application/json' }, signal: AbortSignal.timeout(10000) }); const data = await r.json().catch(() => ({}));
+  if (!r.ok || !data.data) throw Object.assign(new Error(data.detail || data.title || `X returned ${r.status}`), { status: r.status === 404 ? 404 : 502 });
+  const x = data.data; return { x_user_id: x.id, x_handle: x.username, x_name: x.name, display_name: x.name, x_avatar_url: x.profile_image_url || null, avatar_url: x.profile_image_url || null, x_bio: x.description || null, bio: x.description || null, x_followers: Number(x.public_metrics?.followers_count || 0), x_verified: Boolean(x.verified), x_created_at: x.created_at || null, x_url: `https://x.com/${x.username}`, identity_source: 'x_api', x_linked_at: new Date().toISOString() };
+}
 async function rpc(method, params) {
   const r = await fetch(SVS_RPC, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }), signal: AbortSignal.timeout(10000) });
   const data = await r.json(); if (data.error) throw new Error(data.error.message || 'RPC error'); return data.result;
@@ -222,13 +231,15 @@ export default async function handler(req, res) {
       const wallet = validWallet(requestUrl.searchParams.get('wallet'));
       const stored = (await supabase(`rep_profiles?wallet=eq.${encodeURIComponent(wallet)}&select=*`).catch(() => []))?.[0] || null; return res.status(200).json({ ok: true, profile: stored || await kolscanIdentity(wallet) });
     }
+    if (path === 'x-profile' && req.method === 'GET') { const profile = await xProfile(requestUrl.searchParams.get('username')); return res.status(200).json({ ok: true, profile }); }
     if (path === 'profile' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
       const wallet = validWallet(body.wallet); const handle = String(body.x_handle || '').replace(/^@/, '').trim().slice(0, 64); const displayName = String(body.display_name || '').trim().slice(0, 80); const bio = String(body.bio || '').trim().slice(0, 500);
       if (!handle && !displayName) throw Object.assign(new Error('Add an X handle or display name.'), { status: 400 });
+      const identity = handle ? await xProfile(handle) : { display_name: displayName, bio };
       await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet }) });
-      const rows = await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ wallet, x_handle: handle || null, display_name: displayName || null, bio: bio || null, updated_at: new Date().toISOString() }) });
-      return res.status(200).json({ ok: true, profile: rows?.[0] || null });
+      const rows = await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ wallet, ...identity, x_handle: identity.x_handle || handle || null, display_name: identity.display_name || displayName || null, bio: identity.bio || bio || null, updated_at: new Date().toISOString() }) });
+      return res.status(200).json({ ok: true, profile: rows?.[0] || { wallet, ...identity } });
     }
     if (path === 'reviews' && req.method === 'GET') {
       const walletParam = requestUrl.searchParams.get('wallet'); const query = walletParam ? `rep_reviews?wallet=eq.${encodeURIComponent(validWallet(walletParam))}&select=*&order=created_at.desc&limit=50` : 'rep_reviews?select=*&order=created_at.desc&limit=50';

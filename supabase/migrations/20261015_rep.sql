@@ -24,8 +24,29 @@ create table if not exists public.rep_profiles (
   bio text,
   avatar_url text,
   verified_x boolean not null default false,
+  x_user_id text,
+  x_name text,
+  x_avatar_url text,
+  x_bio text,
+  x_followers bigint,
+  x_verified boolean not null default false,
+  x_created_at timestamptz,
+  x_url text,
+  identity_source text,
+  x_linked_at timestamptz,
   updated_at timestamptz not null default now()
 );
+
+alter table public.rep_profiles add column if not exists x_user_id text;
+alter table public.rep_profiles add column if not exists x_name text;
+alter table public.rep_profiles add column if not exists x_avatar_url text;
+alter table public.rep_profiles add column if not exists x_bio text;
+alter table public.rep_profiles add column if not exists x_followers bigint;
+alter table public.rep_profiles add column if not exists x_verified boolean not null default false;
+alter table public.rep_profiles add column if not exists x_created_at timestamptz;
+alter table public.rep_profiles add column if not exists x_url text;
+alter table public.rep_profiles add column if not exists identity_source text;
+alter table public.rep_profiles add column if not exists x_linked_at timestamptz;
 
 create table if not exists public.rep_wallet_transactions (
   wallet text not null references public.rep_wallets(wallet) on delete cascade,
