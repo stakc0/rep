@@ -3,10 +3,10 @@
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const short = v => v ? `${v.slice(0,6)}…${v.slice(-5)}` : 'unknown';
   const verified = '<img class="verified-check" src="/assets/img/verified-check.png" alt="verified" title="X identity indexed">';
-  let wallets = [];
+  let wallets = []; let voteCounts = {};
   const score = r => { const state = voteState(r.wallet); const up = Number(r.votes_up || state.up || 0); const down = Number(r.votes_down || state.down || 0); const total = up + down; return total ? Math.round((up / total) * 100) : 50; };
   const avatar = r => r.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(r.avatar)}" alt="" loading="lazy">` : `<span class="wallet-fallback">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
-  function voteState(wallet) { try { return JSON.parse(localStorage.getItem(`rep-vote:${wallet}`) || '{}'); } catch { return {}; } }
+  function voteState(wallet) { try { return { ...(voteCounts[wallet] || {}), ...JSON.parse(localStorage.getItem(`rep-vote:${wallet}`) || '{}') }; } catch { return voteCounts[wallet] || {}; } }
   function render() {
     const q = ($('#walletSearch')?.value || '').toLowerCase().trim();
     const rows = wallets.filter(r => `${r.name || ''} ${r.twitter || ''} ${r.wallet || ''}`.toLowerCase().includes(q));
@@ -14,6 +14,7 @@
     $('#walletCount').textContent = wallets.length;
     $('#searchCount').textContent = q ? `${rows.length} matches` : 'all wallets';
   }
+  async function loadVotes() { try { const res = await fetch('/api/votes', { cache: 'no-store' }); const data = await res.json(); if (res.ok && data.ok) { voteCounts = data.votes || {}; render(); } } catch {} }
   async function load(url, background = false) { try { const res = await fetch(url, { cache: background ? 'no-store' : 'force-cache' }); const data = await res.json(); if (!res.ok || !data.ok) throw Error('index unavailable'); wallets = data.wallets || []; render(); const age = data.cacheAgeMs != null ? Math.max(0, Math.round(data.cacheAgeMs / 1000)) : 0; $('#indexStatus').textContent = background ? 'live index refreshed' : `cached index · ${age ? `${age}s old` : 'ready'}`; } catch (e) { if (!wallets.length) { $('#indexStatus').textContent = 'cached index unavailable'; $('#walletDirectory').innerHTML = '<div class="empty-state">The wallet index is temporarily unavailable.</div>'; } } }
   $('#walletDirectory')?.addEventListener('click', async e => { const button = e.target.closest('[data-vote]'); if (!button) return; e.preventDefault(); e.stopPropagation(); const wallet = button.dataset.wallet; const vote = Number(button.dataset.vote); try { const response = await fetch('/api/vote', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ wallet, vote }) }); const data = await response.json(); if (response.ok && data.ok) { localStorage.setItem(`rep-vote:${wallet}`, JSON.stringify({ up:data.up, down:data.down })); render(); } } catch {} });
   $('#walletSearch')?.addEventListener('input', render);
@@ -22,4 +23,5 @@
   window.addEventListener('keydown', e => { if (e.key === '/' && document.activeElement?.tagName !== 'INPUT') { e.preventDefault(); $('#walletSearch')?.focus(); } });
   load('/data/kolscan.json');
   load('/api/kolscan', true);
+  loadVotes();
 })();
