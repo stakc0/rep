@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b1b1b">
+<link rel="icon" href="assets/img/politic-logo.png" type="image/png">
+<meta property="og:type" content="website"><meta property="og:site_name" content="politic"><meta property="og:image" content="https://politic-fun.vercel.app/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://politic-fun.vercel.app/assets/img/og.jpg">
+<link rel="preload" href="assets/fonts/jbm.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/w.css">
+<script>window.WRLD_CONFIG = { ca: '2eMzJcDLaBsnPx9KaCttikGjw5xixEmTbb1Du7Pfpump', x: 'https://x.com/politicdotfun' };</script>
+
+<title>politic · launch</title>
+<meta name="description" content="Launch a pump.fun coin with a declared political destination and visible political destination.">
+<meta property="og:title" content="politic.fun · launch with a political destination">
+</head>
+<body data-page="launch">
+<header class="top">
+  <a class="logo" href="/" aria-label="politic home"><img src="assets/img/politic-logo.png" alt=""><span class="wn">politic<i>_</i></span></a>
+  <nav class="nav" aria-label="main">
+    <a href="/" data-nav="home">home</a><a href="/launch" data-nav="launch">launch</a><a href="/#coins" data-nav="coins">coins</a><a href="/#engine" data-nav="how">how it works</a><a href="/docs" data-nav="docs">docs</a>
+  </nav>
+  <div class="acts"><a class="br launchb" href="/launch"><span class="p">+</span> launch</a><button class="br" type="button" data-connect>connect</button></div>
+</header>
+<div class="tape" id="tape" aria-label="political fee routing"><div class="in"><span class="it dim">fees follow the destination…</span><span class="sep">//</span><span class="it dim">fees follow the destination…</span><span class="sep">//</span></div></div>
+
+<main class="wrap">
+  <div class="prompt" id="prompt" style="margin-top:28px"><span class="gt">&gt;</span>launch a coin, wired to a political destination<span class="cur u"></span></div>
+  <div class="lgrid">
+    <div>
+      <section class="box step" id="s1">
+        <div class="hd"><h2>01 · THE COIN</h2></div>
+        <div class="bd">
+          <div class="two">
+            <div class="fld"><label for="fName">name</label><input id="fName" type="text" maxlength="32" placeholder="name of the coin" autocomplete="off"></div>
+            <div class="fld"><label for="fSym">ticker</label><input id="fSym" type="text" maxlength="10" placeholder="TICKER" autocomplete="off" style="text-transform:uppercase"></div>
+          </div>
+          <div class="fld"><label for="fDesc">description (pump.fun shows it)</label><textarea id="fDesc" maxlength="500" placeholder="what the coin is about"></textarea></div>
+          <div class="pic"><label class="drop" id="drop" for="fImg" tabindex="0">+ picture<br>png · jpg · gif</label><input id="fImg" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+            <div class="dim" style="font-size:12px">square works best. it is cropped to 512×512.</div></div>
+          <div class="fld"><label for="fWeb">political destination site</label><input id="fWeb" type="url" placeholder="https://official-party-or-pac.org" required></div>
+          <div class="box" style="margin-top:14px;background:var(--paper2)"><div class="hd"><h2>CHOOSE A POLITICAL DESTINATION</h2><div class="ctl"><span>official public sites · verify before launch</span></div></div><div class="bd"><div id="partyGrid" class="chips"></div><p class="dim" style="font-size:12px;margin-top:10px">The selected site identifies the intended party or PAC destination. The destination stays in the launch metadata and token directory. The token metadata always remains at politic.fun/&lt;mint&gt;.</p></div></div>
+        </div>
+      </section>
+
+
+      <section class="box step" id="s3">
+        <div class="hd"><h2>02 · THE FIRST BUY</h2></div>
+        <div class="bd">
+          <p class="sub">pump.fun coins launch with a first buy. The tokens it buys are sent to your wallet right after the coin is created.</p>
+          <div class="fld"><label for="fDev">first buy: <b id="devV">0.10</b> SOL</label><input id="fDev" class="range" type="range" min="0.01" max="5" step="0.01" value="0.1"></div>
+          <table class="costs" id="costs"></table>
+        </div>
+      </section>
+
+      <section class="box step" id="s4">
+        <div class="hd"><h2>03 · LAUNCH</h2></div>
+        <div class="bd">
+          <div class="fld"><label>your connected wallet</label>
+            <div class="addr"><span class="dim" id="walletState">connect your Solana wallet to launch</span><button class="br" type="button" data-connect>connect</button></div></div>
+          <p class="dim" style="font-size:12px;margin:6px 0 14px">Creator fees are sent to <code>1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN</code>. The selected party or PAC is recorded as the public political destination.</p>
+          <button class="btn" type="button" id="go">launch <span class="k">-&gt;</span></button>
+          <div id="err" class="msg" style="margin-top:14px" hidden></div>
+          <div id="flow" style="margin-top:16px" hidden>
+            <div class="prog" id="prog"></div>
+            <div id="dep" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <div class="box"><div class="hd"><h2>WHAT HAPPENS</h2></div>
+        <div class="bd" style="font-size:12.5px;color:var(--ink2)">
+          <div>1. we record the coin and its political destination and give you its wallet</div>
+          <div>2. you send one SOL transfer to that wallet</div>
+          <div>3. the engine creates the coin on pump.fun from it, with your first buy</div>
+          <div>4. your tokens and any unused SOL come back to you</div>
+          <div>5. creator fees route to 1iqoin4QcFPeVusTYdmQFZoonbZAXAhucvLxhpf78gN and the selected destination stays visible on the coin’s public page</div>
+        </div></div>
+    </aside>
+  </div>
+</main>
+<div style="height:60px"></div>
+<script src="assets/js/rules.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/launch.js"></script>
+</body>
+</html>
