@@ -74,7 +74,9 @@ const SUPABASE_URL = process.env.DEFAULT_SUPABASE_URL || process.env.SUPABASE_UR
 const SUPABASE_KEY = process.env.DEFAULT_SUPABASE_ACCESS_TOKEN || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const SVS_RPC = process.env.SVS_RPC_HTTPS_ENDPOINT || process.env.PUMP_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const walletMemoryCache = new Map();
+const kolscanCache = { at: 0, wallets: [], staleAt: 0 };
 const CACHE_TTL_MS = 45_000;
+const KOLSCAN_TTL_MS = 60_000;
 
 function validWallet(value) {
   try { return new PublicKey(String(value || '')).toBase58(); } catch { throw Object.assign(new Error('Enter a valid Solana wallet address.'), { status: 400 }); }
@@ -130,9 +132,12 @@ function normalizeTx(item) {
 }
 function stripHtml(value = '') { return String(value).replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&#x27;/g, "'").replace(/&quot;/g, '"').trim(); }
 async function kolscanLeaderboard() {
-  const r = await fetch('https://kolscan.io/leaderboard', { headers: { 'user-agent': 'REP reputation index/1.0', accept: 'text/html' }, signal: AbortSignal.timeout(20000) });
-  if (!r.ok) throw Object.assign(new Error(`Kolscan returned ${r.status}`), { status: 502 });
-  const html = await r.text(); const wallets = new Map();
+  if (kolscanCache.wallets.length && Date.now() - kolscanCache.at < KOLSCAN_TTL_MS) return kolscanCache.wallets;
+  const previous = kolscanCache.wallets;
+  try {
+    const r = await fetch('https://kolscan.io/leaderboard', { headers: { 'user-agent': 'REP reputation index/1.0', accept: 'text/html' }, signal: AbortSignal.timeout(20000) });
+    if (!r.ok) throw Object.assign(new Error(`Kolscan returned ${r.status}`), { status: 502 });
+    const html = await r.text(); const wallets = new Map();
   const accounts = /href="\/account\/([1-9A-HJ-NP-Za-km-z]{32,44})\?timeframe=1"/g;
   let match;
   while ((match = accounts.exec(html))) {
@@ -141,7 +146,13 @@ async function kolscanLeaderboard() {
     const profit = Number(dataChunk.match(/\"profit\":(-?[0-9.]+)/)?.[1] || 0);
     wallets.set(wallet, { wallet, name, avatar, twitter, profit, source: 'kolscan' });
   }
-  return [...wallets.values()];
+    const result = [...wallets.values()];
+    kolscanCache.at = Date.now(); kolscanCache.wallets = result; kolscanCache.staleAt = Date.now();
+    return result;
+  } catch (error) {
+    if (previous.length) return previous;
+    throw error;
+  }
 }
 async function indexKolscan() {
   const rows = await kolscanLeaderboard();
@@ -194,7 +205,7 @@ export default async function handler(req, res) {
     if (path === 'tokens' && req.method === 'GET') { res.setHeader('cache-control', 'public, s-maxage=15, stale-while-revalidate=60'); return res.status(200).json({ ok: true, at: Date.now(), creatorFeeWallet: CREATOR_FEE_WALLET, tokens: await listedTokens() }); }
     if (path === 'politics' && req.method === 'GET') return res.status(200).json(await politicsNews());
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
-    if (path === 'kolscan' && req.method === 'GET') { const wallets = await kolscanLeaderboard(); res.setHeader('cache-control', 'public, s-maxage=60, stale-while-revalidate=300'); return res.status(200).json({ ok: true, source: 'kolscan', wallets, indexedAt: Date.now() }); }
+    if (path === 'kolscan' && req.method === 'GET') { const wallets = await kolscanLeaderboard(); res.setHeader('cache-control', 'public, s-maxage=60, stale-while-revalidate=300'); return res.status(200).json({ ok: true, source: 'kolscan', wallets, indexedAt: kolscanCache.at, cacheAgeMs: Date.now() - kolscanCache.at }); }
     if (path === 'index/kolscan' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexKolscan()) });
     if (path === 'wallet' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('address'));
