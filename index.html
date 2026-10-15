@@ -1,66 +1,190 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#64da98">
-  <meta name="description" content="REP is the reputation layer for pump.fun. Review wallets, follow proven traders, and warn people before they copy the wrong wallet.">
-  <meta property="og:title" content="REP · reputation for the trenches">
-  <meta property="og:description" content="A public reputation index for pump.fun wallets and traders.">
-  <link rel="preload" href="assets/fonts/jbm.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/w.css">
-  <title>REP · reputation for the trenches</title>
-</head>
-<body>
-  <header class="top wrap">
-    <a class="brand" href="/" aria-label="REP home"><span class="brand-mark">R</span><span>REP<span class="accent">.</span></span></a>
-    <nav class="nav" aria-label="Main navigation"><a class="active" href="#index">index</a><a href="#how">how it works</a><a href="#standards">standards</a><a href="/docs">docs</a></nav>
-    <a class="button button-dark" href="#search">search a wallet <span>↗</span></a>
-  </header>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#64da98">
+<link rel="icon" href="assets/img/fav64.png" type="image/png">
+<meta property="og:type" content="website"><meta property="og:site_name" content="REP"><meta property="og:image" content="https://rep-fun.vercel.app/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://rep-fun.vercel.app/assets/img/og.jpg">
+<link rel="preload" href="assets/fonts/jbm.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/w.css">
+<script>window.WRLD_CONFIG = { ca: '92spVxX8fYSuceQfmz9auvBTupZsr6buorpX2bBXpump', x: 'https://x.com/repdotfun' };</script>
 
-  <main>
-    <section class="hero wrap">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="pulse"></span> THE REPUTATION LAYER FOR PUMP.FUN</p>
-        <h1>Before you copy<br><em>check their REP.</em></h1>
-        <p class="hero-lede">A public index for the people and wallets moving through the trenches. See the track record, read the receipts, and help others avoid the same mistakes.</p>
-        <div class="hero-actions"><a class="button button-green" href="#search">look up a wallet <span>↗</span></a><a class="text-link" href="#how">why REP exists <span>↓</span></a></div>
-        <div class="hero-note"><span class="note-line"></span><span>performance is public. reputation should be too.</span></div>
+<title>REP · reputation for the trenches</title>
+<meta name="description" content="Search pump.fun wallets, read the receipts, and help others avoid bad actors.">
+<meta property="og:title" content="REP · reputation for the trenches"><meta property="og:description" content="A public reputation index for pump.fun wallets and traders.">
+<style>#live,#events,#try,#rulebooks,#fired,#engine,#faq{display:none!important}.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.dest-grid a{display:grid;grid-template-columns:28px 1fr;gap:4px 10px;padding:16px;background:var(--paper);font-weight:700}.dest-grid a:hover{background:var(--paper2)}.dest-grid img{width:24px;height:24px;grid-row:span 2;object-fit:contain;filter:grayscale(1)}.dest-grid span{font-size:11px;color:var(--mid);font-weight:400}@media(max-width:700px){.dest-grid{grid-template-columns:1fr}}</style></head>
+<body data-page="home">
+<header class="top">
+  <a class="logo" href="/" aria-label="REP home"><img src="assets/img/fav64.png" alt=""><span class="wn">REP<i>_</i></span></a>
+  <nav class="nav" aria-label="main">
+    <a href="/" data-nav="home">index</a><a href="/#destinations" data-nav="profiles">wallets</a><a href="/#how" data-nav="how">how REP works</a><a href="/#coins" data-nav="coins">activity</a><a href="/docs" data-nav="docs">standards</a>
+  </nav>
+  <div class="acts"><a class="br launchb" href="/#destinations"><span class="p">+</span> browse index</a><button class="br" type="button" data-connect>connect</button></div>
+</header>
+<div class="tape" id="tape" aria-label="wallet reputation signals"><div class="in"><span class="it dim">activity leaves receipts…</span><span class="sep">//</span><span class="it dim">activity leaves receipts…</span><span class="sep">//</span></div></div>
+
+
+<main>
+<section class="wrap hero" aria-label="REP">
+  <div>
+    <div class="prompt" id="prompt"><span class="gt">&gt;</span>wallets with a public track record<span class="cur u"></span></div>
+    <h1 class="sr">Check the reputation.</h1>
+    <pre class="big" aria-hidden="true"><span class="f1">##</span><span class="s1">\</span>      <span class="f1">##</span><span class="s1">\</span>                     <span class="f1">##</span><span class="s1">\</span>       <span class="f1">##</span><span class="s1">\</span>
+<span class="f1">##</span> <span class="s1">|</span> <span class="f1">#</span><span class="s1">\</span>  <span class="f1">##</span> <span class="s1">|</span>                    <span class="f1">##</span> <span class="s1">|</span>      <span class="f1">##</span> <span class="s1">|</span>
+<span class="f1">##</span> <span class="s1">|</span><span class="f1">###</span><span class="s1">\</span> <span class="f1">##</span> <span class="s1">|</span> <span class="f1">######</span><span class="s1">\</span>   <span class="f1">######</span><span class="s1">\</span>  <span class="f1">##</span> <span class="s1">|</span> <span class="f1">#######</span> <span class="s1">|</span>      <span class="f1">######</span><span class="s1">\</span><span class="f1">####</span><span class="s1">\</span>   <span class="f1">######</span><span class="s1">\</span> <span class="f1">##</span><span class="s1">\</span>    <span class="f1">##</span><span class="s1">\</span>  <span class="f1">######</span><span class="s1">\</span>   <span class="f1">#######</span><span class="s1">\</span>
+<span class="f1">##</span> <span class="f1">##</span> <span class="f1">##</span><span class="s1">\</span><span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span>  <span class="s1">__</span><span class="f1">##</span><span class="s1">\</span> <span class="f1">##</span>  <span class="s1">__</span><span class="f1">##</span><span class="s1">\</span> <span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span>  <span class="s1">__</span><span class="f1">##</span> <span class="s1">|</span>      <span class="f1">##</span>  <span class="s1">_</span><span class="f1">##</span>  <span class="s1">_</span><span class="f1">##</span><span class="s1">\</span> <span class="f1">##</span>  <span class="s1">__</span><span class="f1">##</span><span class="s1">\\</span><span class="f1">##</span><span class="s1">\</span>  <span class="f1">##</span>  <span class="s1">|</span><span class="f1">##</span>  <span class="s1">__</span><span class="f1">##</span><span class="s1">\</span> <span class="f1">##</span>  <span class="s1">_____|</span>
+<span class="f1">####</span>  <span class="s1">_</span><span class="f1">####</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">/</span>  <span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">|</span>  <span class="s1">\__|</span><span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">/</span>  <span class="f1">##</span> <span class="s1">|</span>      <span class="f1">##</span> <span class="s1">/</span> <span class="f1">##</span> <span class="s1">/</span> <span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">/</span>  <span class="f1">##</span> <span class="s1">|\</span><span class="f1">##</span><span class="s1">\</span><span class="f1">##</span>  <span class="s1">/</span> <span class="f1">########</span> <span class="s1">|\</span><span class="f1">######</span><span class="s1">\</span>
+<span class="f1">###</span>  <span class="s1">/</span> <span class="s1">\</span><span class="f1">###</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">|</span>  <span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">|</span>      <span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">|</span>  <span class="f1">##</span> <span class="s1">|</span>      <span class="f1">##</span> <span class="s1">|</span> <span class="f1">##</span> <span class="s1">|</span> <span class="f1">##</span> <span class="s1">|</span><span class="f1">##</span> <span class="s1">|</span>  <span class="f1">##</span> <span class="s1">|</span> <span class="s1">\</span><span class="f1">###</span>  <span class="s1">/</span>  <span class="f1">##</span>   <span class="s1">____|</span> <span class="s1">\____</span><span class="f1">##</span><span class="s1">\</span>
+<span class="f1">##</span>  <span class="s1">/</span>   <span class="s1">\</span><span class="f1">##</span> <span class="s1">|\</span><span class="f1">######</span>  <span class="s1">|</span><span class="f1">##</span> <span class="s1">|</span>      <span class="f1">##</span> <span class="s1">|\</span><span class="f1">#######</span> <span class="s1">|</span>      <span class="f1">##</span> <span class="s1">|</span> <span class="f1">##</span> <span class="s1">|</span> <span class="f1">##</span> <span class="s1">|\</span><span class="f1">######</span>  <span class="s1">|</span>  <span class="s1">\</span><span class="f1">#</span>  <span class="s1">/</span>   <span class="s1">\</span><span class="f1">#######</span><span class="s1">\</span> <span class="f1">#######</span>  <span class="s1">|</span><span class="f1">##</span><span class="s1">\</span>
+<span class="s1">\__/</span>     <span class="s1">\__|</span> <span class="s1">\______/</span> <span class="s1">\__|</span>      <span class="s1">\__|</span> <span class="s1">\_______|</span>      <span class="s1">\__|</span> <span class="s1">\__|</span> <span class="s1">\__|</span> <span class="s1">\______/</span>    <span class="s1">\_/</span>     <span class="s1">\_______|\_______/</span> <span class="f1">#</span>  <span class="s1">|</span>
+                                                                                                           <span class="s1">\_/</span></pre>
+    <pre class="big" aria-hidden="true">                    <span class="f2">##</span><span class="s2">\</span>
+                    <span class="s2">\__|</span>
+ <span class="f2">#######</span><span class="s2">\</span>  <span class="f2">######</span><span class="s2">\</span>  <span class="f2">##</span><span class="s2">\</span> <span class="f2">#######</span><span class="s2">\</span>        <span class="f2">######</span><span class="s2">\</span><span class="f2">####</span><span class="s2">\</span>   <span class="f2">######</span><span class="s2">\</span> <span class="f2">##</span><span class="s2">\</span>    <span class="f2">##</span><span class="s2">\</span>  <span class="f2">######</span><span class="s2">\</span>   <span class="f2">#######</span><span class="s2">\</span>
+<span class="f2">##</span>  <span class="s2">_____|</span><span class="f2">##</span>  <span class="s2">__</span><span class="f2">##</span><span class="s2">\</span> <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span>  <span class="s2">__</span><span class="f2">##</span><span class="s2">\</span>       <span class="f2">##</span>  <span class="s2">_</span><span class="f2">##</span>  <span class="s2">_</span><span class="f2">##</span><span class="s2">\</span> <span class="f2">##</span>  <span class="s2">__</span><span class="f2">##</span><span class="s2">\\</span><span class="f2">##</span><span class="s2">\</span>  <span class="f2">##</span>  <span class="s2">|</span><span class="f2">##</span>  <span class="s2">__</span><span class="f2">##</span><span class="s2">\</span> <span class="f2">##</span>  <span class="s2">_____|</span>
+<span class="f2">##</span> <span class="s2">/</span>      <span class="f2">##</span> <span class="s2">/</span>  <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">/</span> <span class="f2">##</span> <span class="s2">/</span> <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">/</span>  <span class="f2">##</span> <span class="s2">|\</span><span class="f2">##</span><span class="s2">\</span><span class="f2">##</span>  <span class="s2">/</span> <span class="f2">########</span> <span class="s2">|\</span><span class="f2">######</span><span class="s2">\</span>
+<span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span> <span class="s2">\</span><span class="f2">###</span>  <span class="s2">/</span>  <span class="f2">##</span>   <span class="s2">____|</span> <span class="s2">\____</span><span class="f2">##</span><span class="s2">\</span>
+<span class="s2">\</span><span class="f2">#######</span><span class="s2">\</span> <span class="s2">\</span><span class="f2">######</span>  <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span><span class="f2">##</span> <span class="s2">|</span>  <span class="f2">##</span> <span class="s2">|</span>      <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|</span> <span class="f2">##</span> <span class="s2">|\</span><span class="f2">######</span>  <span class="s2">|</span>  <span class="s2">\</span><span class="f2">#</span>  <span class="s2">/</span>   <span class="s2">\</span><span class="f2">#######</span><span class="s2">\</span> <span class="f2">#######</span>  <span class="s2">|</span><span class="f2">##</span><span class="s2">\</span>
+ <span class="s2">\_______|</span> <span class="s2">\______/</span> <span class="s2">\__|\__|</span>  <span class="s2">\__|</span>      <span class="s2">\__|</span> <span class="s2">\__|</span> <span class="s2">\__|</span> <span class="s2">\______/</span>    <span class="s2">\_/</span>     <span class="s2">\_______|\_______/</span> <span class="s2">\__|</span></pre>
+    <p class="lede">Before you copy a wallet, check its record. REP makes performance, behavior, reviews, and warnings visible in one public profile.</p>
+    <div class="cta"><a class="btn" href="/#destinations">submit a review <span class="k">-&gt;</span></a><a class="br" href="/#destinations">browse the index</a></div>
+    <div class="ca" id="ca"></div>
+  </div>
+  <div class="globe route-card" aria-label="REP visual" oncontextmenu="return false">
+    <div class="video-frame"><video autoplay muted loop playsinline preload="metadata" controlslist="nodownload noplaybackrate" disablepictureinpicture oncontextmenu="return false"><source src="/assets/video/politic-loop.mp4" type="video/mp4"></video></div>
+  </div>
+</section>
+
+<section class="wrap sec rv" id="live">
+  <div class="box">
+    <div class="hd"><h2>WALLET SIGNALS, LIVE</h2><div class="ctl"><span id="liveAt" class="livedot">reading…</span><button class="br sm" type="button" id="liveRe">read now</button></div></div>
+    <div class="bd">
+      <p class="sub">These are the readings the engine acts on, straight from the sources. Every profile is built from public activity and community evidence.</p>
+      <div class="cols">
+        <div><div class="k3">price · coinbase</div><div id="lvPx"><div class="row"><span class="dim">reading…</span></div></div></div>
+        <div><div class="k3">weather · open-meteo</div><div id="lvWx"><div class="row"><span class="dim">reading…</span></div></div></div>
+        <div><div class="k3">sports · espn</div><div id="lvGm"><div class="row"><span class="dim">reading…</span></div></div></div>
+        <div><div class="k3">wallet behavior · performance · community signals</div><div id="lvEv"><div class="row"><span class="dim">reading…</span></div></div></div>
       </div>
-      <div class="hero-visual" aria-label="Reputation profile preview">
-        <div class="profile-window">
-          <div class="window-top"><span class="dots">● ● ●</span><span>rep.fun / wallet</span><span class="status">LIVE INDEX</span></div>
-          <div class="profile-head"><div class="avatar avatar-green">0x</div><div><strong>mistergreen</strong><span class="mono muted">7h4...K9p</span></div><span class="score high">A+ <small>REP</small></span></div>
-          <div class="profile-stats"><div><small>REALIZED PNL</small><b>+184.2 SOL</b></div><div><small>WIN RATE</small><b>68.4%</b></div><div><small>REVIEWS</small><b>42</b></div></div>
-          <div class="signal"><span class="signal-dot"></span><div><strong>community signal</strong><p>Consistent entries. No reported wallet-drains. 31 verified receipts.</p></div></div>
-          <div class="bars"><span style="height:42%"></span><span style="height:58%"></span><span style="height:34%"></span><span style="height:76%"></span><span style="height:61%"></span><span style="height:88%"></span><span style="height:72%"></span><span style="height:94%"></span><span style="height:80%"></span><span style="height:100%"></span><span style="height:82%"></span><span style="height:92%"></span></div>
-          <div class="window-foot"><span>12 MONTHS OF ACTIVITY</span><span class="green-text">↗ verified on-chain</span></div>
-        </div>
-        <div class="floating-tag tag-one">◆ 31 receipts</div><div class="floating-tag tag-two">↓ 3 warnings resolved</div>
+    </div>
+    <div class="foot"><span>sources: <a href="https://www.coinbase.com/price/solana" target="_blank" rel="noopener">coinbase</a> · <a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo</a> · <a href="https://www.espn.com" target="_blank" rel="noopener">espn</a> · <a href="https://polymarket.com" target="_blank" rel="noopener">polymarket</a> · x posts once the X API key is set</span><span id="liveNext"></span></div>
+  </div>
+</section>
+
+<section class="wrap sec rv" id="events">
+  <div class="box">
+    <div class="hd"><h2>WALLET PROFILES</h2><div class="ctl"><span>live wallet signals · inspect the evidence</span></div></div>
+    <div class="bd">
+      <div class="chips" id="evTabs"></div>
+      <div id="evList"><div class="empty">reading the odds…</div></div>
+    </div>
+    <div class="foot"><span>a rule can fire when an event’s YES odds rise above or fall below a level, or when it resolves YES or NO</span><span id="evAt"></span></div>
+  </div>
+</section>
+
+<section class="wrap sec rv" id="destinations"><div class="box"><div class="hd"><h2>WALLET PROFILES</h2><div class="ctl"><span>find the people behind the wallets</span></div></div><div class="bd"><p class="sub">Every wallet has a history. REP gives it context: performance, behavior, reviews, and warnings from the people who were there.</p><div class="dest-grid"><a href="/#coins"><b>mistergreen</b><span> A+ · +184.2 SOL · 42 reviews</span></a><a href="/#coins"><b>quietsize</b><span> B+ · +91.8 SOL · consistent entries</span></a><a href="/#coins"><b>solsniper</b><span> C · +28.1 SOL · 67 reviews</span></a><a href="/#coins"><b>fastlane</b><span> D− · 12 warnings · high risk</span></a><a href="/#coins"><b>earlybird</b><span> A · clean history · 26 reviews</span></a><a href="/#coins"><b>0xpatient</b><span> B · long-term holder · 14 reviews</span></a></div></div></div></section>
+
+<section class="wrap sec rv politics-panel" id="politics"><div class="box"><div class="hd"><h2>COMMUNITY SIGNALS</h2><div class="ctl"><span id="politicsAt" class="dim">reading sources…</span><button class="br sm" type="button" id="politicsRe">refresh</button></div></div><div class="bd"><div id="politicsNews" class="news-grid"><div class="empty">loading reputation desks…</div></div></div><div class="foot"><span>NYT · POLITICO · THE HILL · BBC</span><span>source links open original reporting</span></div></div></section>
+
+<section class="wrap sec rv politics-panel" id="odds"><div class="box"><div class="hd"><h2>REPUTATION · EVIDENCE</h2><div class="ctl"><span id="oddsAt" class="dim">reading markets…</span><a class="br sm" href="https://polymarket.com" target="_blank" rel="noopener">open ↗</a></div></div><div class="bd"><div id="politicsOdds" class="odds-grid"><div class="empty">loading reputation markets…</div></div></div><div class="foot"><span>live public market probabilities</span><span>not financial advice</span></div></div></section>
+
+<section class="wrap sec rv" id="how">
+  <div class="box pipe">
+    <div class="hd"><h2>HOW REP WORKS</h2><div class="ctl"><span id="pipeName" class="dim"></span><button class="br sm" type="button" id="pipeP">pause</button></div></div>
+    <div class="bd">
+      <pre id="pipe" aria-hidden="true"></pre>
+      <div class="st">
+        <div><span>1</span><b>CHOOSE</b>look up a wallet and inspect its history before you follow it.</div>
+        <div><span>2</span><b>DISCLOSE</b>reviews and receipts are stored with the profile and shown in the public index.</div>
+        <div><span>3</span><b>LAUNCH</b>read on-chain performance and community notes before you copy a position.</div>
+        <div><span>4</span><b>ROUTE</b>good traders leave receipts; bad actors leave warnings.</div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
-    <section class="ticker"><div class="ticker-inner"><span>DON'T COPY BLINDLY</span><i>✳</i><span>READ THE RECEIPTS</span><i>✳</i><span>REPUTATION IS DATA</span><i>✳</i><span>DON'T COPY BLINDLY</span><i>✳</i><span>READ THE RECEIPTS</span><i>✳</i></div></section>
+<section class="wrap sec rv" id="try">
+  <div class="box">
+    <div class="hd"><h2>TRY A RULE</h2><div class="ctl"><span>nothing launches from here</span></div></div>
+    <div class="bd">
+      <p class="sub">Write one rule and check it against the world as it is right now. The engine asks this same question every few minutes for every live coin.</p>
+      <div id="tryEd"></div>
+      <div class="code" id="tryCode" style="margin-top:12px"></div>
+      <div class="cta" style="margin-top:14px"><button class="btn" type="button" id="tryGo">read the world <span class="k">-&gt;</span></button><a class="br" id="tryUse" href="/#destinations">submit a review with this rule</a></div>
+      <div class="verdict" id="tryOut" hidden></div>
+    </div>
+  </div>
+</section>
 
-    <section class="index-section wrap" id="index">
-      <div class="section-heading"><div><p class="eyebrow">01 / THE INDEX</p><h2>Find the people<br>behind the wallets.</h2></div><p class="section-intro">The wallet is only the address. REP is the context around it: outcomes, behavior, history, and what other traders have actually witnessed.</p></div>
-      <div class="search-box" id="search"><span class="search-icon">⌕</span><input id="walletSearch" type="search" placeholder="Search a wallet, trader, or ENS name" aria-label="Search a wallet"><kbd>⌘ K</kbd></div>
-      <div class="filter-row"><span class="muted">TRENDING PROFILES</span><div><button class="filter active">all</button><button class="filter">top performers</button><button class="filter">most reviewed</button><button class="filter warning">warnings</button></div></div>
-      <div class="profiles" id="profiles">
-        <a class="profile-card" href="/token/mistergreen"><div class="card-top"><div class="avatar avatar-green">0x</div><span class="score high">A+</span></div><strong>mistergreen</strong><span class="mono muted">7h4...K9p</span><div class="card-row"><span>realized PNL</span><b>+184.2 SOL</b></div><div class="card-bottom"><span class="stars">★★★★★</span><span>42 reviews</span></div></a>
-        <a class="profile-card" href="/token/quietsize"><div class="card-top"><div class="avatar avatar-blue">QS</div><span class="score good">B+</span></div><strong>quietsize</strong><span class="mono muted">4fA...2Lm</span><div class="card-row"><span>realized PNL</span><b>+91.8 SOL</b></div><div class="card-bottom"><span class="stars">★★★★☆</span><span>19 reviews</span></div></a>
-        <a class="profile-card" href="/token/solsniper"><div class="card-top"><div class="avatar avatar-orange">SS</div><span class="score caution">C</span></div><strong>solsniper</strong><span class="mono muted">9xQ...B71</span><div class="card-row"><span>realized PNL</span><b>+28.1 SOL</b></div><div class="card-bottom"><span class="stars">★★★☆☆</span><span>67 reviews</span></div></a>
-        <a class="profile-card warning-card" href="/token/fastlane"><div class="card-top"><div class="avatar avatar-red">FL</div><span class="score risk">D−</span></div><strong>fastlane</strong><span class="mono muted">3nR...w8C</span><div class="card-row"><span>community signal</span><b class="red-text">HIGH RISK</b></div><div class="card-bottom"><span class="warning-label">▲ 12 warnings</span><span>8 reviews</span></div></a>
+<section class="wrap sec rv" id="rulebooks">
+  <div class="box">
+    <div class="hd"><h2>CAMPAIGN STARTERS</h2><div class="ctl"><span>start from one, change anything</span></div></div>
+    <div class="bd"><div class="tpls" id="tpls"></div></div>
+  </div>
+</section>
+
+
+<section class="wrap sec rv" id="coins">
+  <div class="box">
+    <div class="hd"><h2>WALLETS ON REP</h2><div class="ctl"><span id="coinsN"></span><a class="br sm" href="/launch">+ launch</a></div></div>
+    <div class="bd" id="coinsBd"><div class="empty">reading the registry…</div></div>
+  </div>
+</section>
+
+<section class="wrap sec rv" id="fired">
+  <div class="box">
+    <div class="hd"><h2>FIRED</h2><div class="ctl"><span>every claim, fire and payout, with its transaction</span></div></div>
+    <div class="bd"><div class="feed" id="feed"><div class="empty">reading the engine log…</div></div></div>
+  </div>
+</section>
+
+<section class="wrap sec rv" id="engine">
+  <div class="box">
+    <div class="hd"><h2>THE ROUTE</h2><div class="ctl"><a class="br sm" href="/docs#custody">read the details</a></div></div>
+    <div class="bd">
+      <p class="sub">REP is a public reputation layer. It does not ask you to trust a leaderboard. It shows the evidence, the pattern, and what the community has reported about a wallet.</p>
+      <div class="cant">
+        <div><div class="h">it cannot</div></div><div><div class="h">so it</div></div>
+        <div>sell the coin. There is no sell action in the code.</div><div>only ever buys, burns, airdrops and pays out.</div>
+        <div>change a rulebook after launch.</div><div>prints the rulebook’s fingerprint in the coin’s pump.fun description.</div>
+        <div>act on a guess. If a source doesn’t answer, the rule waits.</div><div>links the reading and the transaction for every fire.</div>
+        <div>move a coin’s SOL anywhere the rules don’t name.</div><div>keeps a small reserve for gas; the rest is the chest.</div>
       </div>
-    </section>
+      <div class="facts">
+        <div><b>5%</b><span>REP index of each fee claim (rulr takes 10%)</span></div>
+        <div><b id="stTick">~5 min</b><span id="stTickL">between engine passes; visits wake it sooner</span></div>
+        <div><b>2 reads</b><span>a level must hold twice before it fires</span></div>
+        <div><b id="stLive">—</b><span>wallets indexed on REP right now</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <section class="manifesto" id="how"><div class="wrap manifesto-grid"><div><p class="eyebrow">02 / THE IDEA</p><h2>Good traders leave<br><em>receipts.</em></h2></div><div class="manifesto-copy"><p>Crypto has an endless supply of wallet trackers, leaderboards, and “alpha” feeds. It has almost nowhere to answer the question that matters most:</p><blockquote>“What kind of person am I following?”</blockquote><p>REP turns wallet history into a living public profile. People can review a trader, attach evidence, recognize good behavior, and warn the next person before they send funds or copy a position.</p><a class="text-link light" href="#standards">read our standards <span>↗</span></a></div></div></section>
+<section class="wrap sec rv" id="faq">
+  <div class="box">
+    <div class="hd"><h2>FAQ</h2></div>
+    <div class="bd">
+      <details><summary>What is REP?</summary><div>REP is a public index for pump.fun wallets and traders. It helps people review performance, recognize consistency, and warn others about exploitative behavior before they copy it. Rules read world events (war, signals, money: live odds and outcomes from Polymarket), prices, sports results and the weather. Posts on X switch on once the X API key is set. The wallet profile stays visible so the next trader can make an informed decision.</div></details>
+      <details><summary>Where does the money for the actions come from?</summary><div>A wallet profile is created from public activity and community context. Reviews should be specific, evidence-linked, and open to challenge.</div></details>
+      <details><summary>Is it custodial?</summary><div>Yes. Each coin’s wallet is derived and held by the REP index, the same model rulr uses. That is what lets rules run without anyone signing. The engine can only do what the rulebook says, and every action is a public transaction you can check on Solscan. If that isn’t for you, don’t launch here.</div></details>
+      <details><summary>What does it cost to launch?</summary><div>Your first buy, about 0.03 SOL of pump.fun rent and fees, and a 0.015 SOL gas reserve that stays in the coin’s wallet. Anything left over after creation goes straight back to you, with your first-buy tokens. If a launch fails, the deposit is returned.</div></details>
+      <details><summary>Can a rule fire on old news?</summary><div>No. Rules start watching the moment the coin is live. A game that ended before launch, or a post from yesterday, never counts. Levels like “SOL above $300” have to hold for two reads in a row, and then they fire once per crossing.</div></details>
+      <details><summary>What if a source is down?</summary><div>The rule waits and the coin’s page says the source is offline. The engine never acts on a missing reading.</div></details>
+      <details><summary>Who holds what?</summary><div>Holders are read from the chain: the largest token accounts, minus the bonding curve, pools and the coin’s own wallet. Up to 20 get paid, pro rata to their bags.</div></details>
+    </div>
+  </div>
+</section>
+</main>
 
-    <section class="steps wrap" id="standards"><div class="section-heading"><div><p class="eyebrow">03 / HOW REP WORKS</p><h2>Context before<br>conviction.</h2></div><p class="section-intro">Not a popularity contest. Not anonymous vibes. Every profile is built from observable activity and community claims that can be challenged.</p></div><div class="step-grid"><article><span class="step-number">01</span><h3>Look up</h3><p>Search any public wallet and see its performance, trading patterns, linked identities, and existing community history.</p></article><article><span class="step-number">02</span><h3>Read the receipts</h3><p>Reviews have a claim, a category, and evidence. Separate a bad trade from a bad actor.</p></article><article><span class="step-number">03</span><h3>Leave a signal</h3><p>Share what you know. Praise consistency, document exploitation, and help the next trader make an informed decision.</p></article></div></section>
 
-    <section class="final-cta wrap"><div><p class="eyebrow">THE FIRST VERSION OF A BETTER MEMORY</p><h2>Never make the<br>same mistake twice.</h2></div><a class="button button-dark" href="#search">explore the index <span>↗</span></a></section>
-  </main>
-  <footer class="footer wrap"><a class="brand" href="/"><span class="brand-mark">R</span><span>REP<span class="accent">.</span></span></a><span class="muted">A public memory for the trenches.</span><span class="mono muted">© 2026 REP / BUILT FOR BETTER SIGNAL</span></footer>
-  <script src="assets/js/home.js"></script>
+
+<script>window.WRLD_ART = {"land": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHwAfvAAAAAAAAAAAAAAAAAAAAAAAAx37///+AAAAAGoABAAAAAAAAAAAAAIe8P///wAA8AAAAAA0AAAAAAAAAAAwADw////4AAIAAAAAAHAAAAAAAAAAALivwAf//wAAAAADAAP/wAHIAAAAAADsj38AH/+gAAAAAEAH///OAAAAgBgAAfw3/gB/+gAAAgAMHe///+/9gBAP/7/nbdrwD/+AAAH/Ag7H////////8H//////g8H/gAAAf/6//f////////Mf/////9H4D4A+AA+ev///////////AP/////4A0B4AAAD5/////////////Af1////gHgA4AAAP5///////////LwAHgD///gH0AAAAAG4/////////+AMAABAC///4D+AAAAGCx/////////4A4AAAAB////n/gAAAOCR/////////4A4AAAAAf///3/wAAAbH//////////9AgAAAAAP/////gAAADf//////////9AAAAAAAF////0YAAAB///////////8AAAAAAAD////8EAAAB///v///////5AAAAAAAD////+AAAAB/f5f///////wAAAAAAAD////gAAAAfxnwP///////jgAAAAAAD///+AAAAAPCb3///////+AAAAAAAAD///8AAAAAfCJf//////+ECAAAAAAAB///8AAAAAGDRf///////mMAAAAAAAA///8AAAAAH+Ai///////E8AAAAAAAAf//wAAAAAP/AA///////BgAAAAAAAAP//gAAAAAf/73///////gAAAAAAAAAD/AQAAAAAf//9/f/////gAAAAAAAAAF+AQAAAAB///+/n/////AAAAAAAAAAC+AAAAAAB///+fwH///+AAAAAAAAAAAeAwAAAAD////f/D///8gAAAAAAAAAAeGEAAAAD////v+B/j/AAAAAAAAAAAAPMAwAAAD////n+AfB+gAAAAAAAAAAAD8AAAAAD////34AeBfAgAAAAAAAAAAAPAAAAAH////3gAcAfAgAAAAAAAAAAADAAAAAD////6AAcAfgwAAAAAAAAAAABBwAAAD////8wAMATAIAAAAAAAAAAAAr/AAAB/////gAIASAAAAAAAAAAAAAAH/gAAA/////gACAAAIAAAAAAAAAAAAH/8AAAYH///AAAAsGAAAAAAAAAAAAAH/+AAAAB//+AAAAUOAAAAAAAAAAAAAP/+AAAAB//8AAAAc+gAAAAAAAAAAAAP//gAAAD//4AAAAMeBgAAAAAAAAAAAP//8AAAB//wAAAAGdCuAAAAAAAAAAAf///AAAA//wAAAACAAHgAAAAAAAAAAP///gAAA//wAAAAB4AHggAAAAAAAAAH///AAAAf/wAAAAACIDQIAAAAAAAAAH//+AAAAf/wAAAAAAAAAAAAAAAAAAAD//+AAAA//wgAAAAABxAAAAAAAAAAAD//8AAAA//wgAAAAAHxgBAAAAAAAAAA//8AAAA//zgAAAAAf/gAAAAAAAAAAAf/8AAAA//DgAAAAAf/gAAAAAAAAAAAf/8AAAAf/DAAAAAD//4CAAAAAAAAAAf/wAAAAf/DAAAAAH//4AAAAAAAAAAAf/AAAAAf+DAAAAAH//8AAAAAAAAAAAf/AAAAAP8AAAAAAH//+AAAAAAAAAAA/+AAAAAP8AAAAAAH//+AAAAAAAAAAA/8AAAAAH4AAAAAAD//+AAAAAAAAAAA/8AAAAAHwAAAAAADwf8AAAAAAAAAAA/gAAAAAAAAAAAAACAP4AAAAAAAAAAB/wAAAAAAAAAAAAAAAD4AEAAAAAAAAB+AAAAAAAAAAAAAAAAAAAGAAAAAAAAB6AAAAAAAAAAAAAAAAAwAMAAAAAAAAA8AAAAAAAAAAAAAAAAAQAYAAAAAAAAB4AAAAAAAAAAAAAAAAAAAwAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAACAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAA8AAf/8d/AAAAAAAAAAAAkAAAAAAACP/+H//////AAAAAAAAAAA+AAAAIf////+////////AAAAAAAOMKPAAAB///////////////gAAAH/8D//8AAAH//////////////4AAAF/////8AAAP///////////////4AAIf/////gwBwf///////////////4AAAH//////AAD////////////////wAAA///////+f//////////////////A/wH///////////////////////////////////////////////////////////////////////////////////////", "land_w": 180, "land_h": 90};</script>
+<script src="assets/js/rules.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/home.js"></script>
+<script src="assets/js/registry.js"></script>
+<script src="assets/js/politics.js"></script>
 </body>
 </html>
