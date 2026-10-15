@@ -1,6 +1,6 @@
-# WRLD
+# REP
 
-A frontend clone of https://www.wrlddo.trade/ with the captured homepage, launch flow, docs, assets, fonts, live world reads, event cards, and responsive layout.
+A direct clone of the WRLD/politic launchpad checkout, packaged as `/rep`.
 
 - Homepage: `/`
 - Launch: `/launch`
