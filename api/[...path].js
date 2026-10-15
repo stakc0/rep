@@ -1,4 +1,5 @@
 import { directPrepare, directConfirm, listLaunches } from '../launch-direct.mjs';
+import { PublicKey } from '@solana/web3.js';
 
 export const config = { api: { bodyParser: false } };
 
@@ -68,6 +69,67 @@ function readBody(req) {
   });
 }
 
+const CIELO_BASE = 'https://feed-api.cielo.finance/api/v1';
+const SUPABASE_URL = process.env.DEFAULT_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.DEFAULT_SUPABASE_ACCESS_TOKEN || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SVS_RPC = process.env.SVS_RPC_HTTPS_ENDPOINT || process.env.PUMP_RPC_URL || 'https://api.mainnet-beta.solana.com';
+
+function validWallet(value) {
+  try { return new PublicKey(String(value || '')).toBase58(); } catch { throw Object.assign(new Error('Enter a valid Solana wallet address.'), { status: 400 }); }
+}
+async function cielo(path, params = {}) {
+  if (!process.env.CIELO_API_KEY) throw Object.assign(new Error('Cielo API is not configured.'), { status: 503 });
+  const u = new URL(`${CIELO_BASE}/${path.replace(/^\//, '')}`);
+  for (const [key, value] of Object.entries(params)) if (value !== undefined && value !== null && value !== '') u.searchParams.set(key, value);
+  const r = await fetch(u, { headers: { accept: 'application/json', 'X-API-KEY': process.env.CIELO_API_KEY }, signal: AbortSignal.timeout(15000) });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(data.message || `Cielo returned ${r.status}`), { status: r.status });
+  return data;
+}
+async function rpc(method, params) {
+  const r = await fetch(SVS_RPC, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }), signal: AbortSignal.timeout(10000) });
+  const data = await r.json(); if (data.error) throw new Error(data.error.message || 'RPC error'); return data.result;
+}
+async function supabase(path, options = {}) {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+  const r = await fetch(`${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${path}`, { ...options, headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'content-type': 'application/json', ...(options.headers || {}) }, signal: AbortSignal.timeout(10000) });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`Supabase returned ${r.status}`);
+  return r.status === 204 ? null : r.json();
+}
+function scoreWallet({ performance, reviews = [] }) {
+  const p = performance?.data || performance || {};
+  const winRate = Number(p.win_rate ?? p.winRate ?? p.metrics?.win_rate ?? 0);
+  const pnl = Number(p.total_pnl ?? p.realized_pnl ?? p.realizedPnl ?? p.metrics?.total_pnl ?? 0);
+  const trades = Number(p.total_trades ?? p.trade_count ?? p.metrics?.total_trades ?? 0);
+  const warnings = reviews.filter(r => ['warning', 'exploitative', 'scam'].includes(String(r.category || '').toLowerCase())).length;
+  const positive = reviews.filter(r => ['positive', 'reliable', 'helpful'].includes(String(r.category || '').toLowerCase())).length;
+  const base = Math.round(Math.min(55, Math.max(0, winRate * .55)) + Math.min(25, Math.max(0, Math.log10(Math.max(1, Math.abs(pnl) + 1)) * 8)) + Math.min(15, trades / 20) + Math.min(10, positive * 2) - Math.min(35, warnings * 7));
+  const total = Math.max(0, Math.min(100, base));
+  return { score: total, grade: total >= 85 ? 'A+' : total >= 75 ? 'A' : total >= 65 ? 'B+' : total >= 52 ? 'B' : total >= 38 ? 'C' : 'D', indicators: { winRate, pnl, trades, warnings, positive } };
+}
+function normalizeTx(item) {
+  const x = item?.tx || item?.transaction || item;
+  return { signature: x?.tx_hash || x?.signature || x?.hash || x?.transaction_hash || '', type: x?.tx_type || x?.type || x?.event_type || 'activity', token: x?.token_symbol || x?.token?.symbol || x?.token_name || '', valueUsd: Number(x?.value_usd || x?.amount_usd || x?.value || 0), timestamp: x?.timestamp || x?.block_timestamp || x?.datetime || null, source: 'cielo' };
+}
+async function walletProfile(wallet) {
+  const [portfolio, feed, performance, reviews, balance] = await Promise.all([
+    cielo(`${wallet}/portfolio`).catch(() => null),
+    cielo('feed', { wallet, chains: 'solana', limit: 5 }).catch(() => null),
+    cielo(`${wallet}/enhanced-stats/profitability-performance`, { days: 'max' }).catch(() => null),
+    supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => []),
+    rpc('getBalance', [wallet, { commitment: 'confirmed' }]).catch(() => null),
+  ]);
+  const portfolioData = portfolio?.data || portfolio || {};
+  const feedItems = feed?.data?.items || feed?.data?.transactions || feed?.items || feed?.transactions || [];
+  const sol = balance?.value != null ? Number(balance.value) / 1e9 : Number(portfolioData.native_balance || portfolioData.sol_balance || 0);
+  const txs = feedItems.slice(0, 5).map(normalizeTx);
+  const rep = scoreWallet({ performance, reviews: reviews || [] });
+  const profile = { wallet, balanceSol: sol, portfolioUsd: Number(portfolioData.total_usd_value || 0), transactions: txs, performance: performance?.data || performance || null, score: rep.score, grade: rep.grade, indicators: rep.indicators, reviews: reviews || [], indexedAt: Date.now() };
+  await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet, score: rep.score, grade: rep.grade, indicators: rep.indicators, last_balance_sol: sol, last_seen_at: new Date().toISOString() }) }).catch(() => null);
+  return profile;
+}
+
 export default async function handler(req, res) {
   const requestUrl = new URL(req.url || '/', 'http://localhost');
   const path = requestUrl.pathname.replace(/^\/api\//, '').replace(/\/$/, '');
@@ -84,6 +146,23 @@ export default async function handler(req, res) {
     if (path === 'tokens' && req.method === 'GET') { res.setHeader('cache-control', 'public, s-maxage=15, stale-while-revalidate=60'); return res.status(200).json({ ok: true, at: Date.now(), creatorFeeWallet: CREATOR_FEE_WALLET, tokens: await listedTokens() }); }
     if (path === 'politics' && req.method === 'GET') return res.status(200).json(await politicsNews());
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
+    if (path === 'wallet' && req.method === 'GET') {
+      const wallet = validWallet(requestUrl.searchParams.get('address'));
+      res.setHeader('cache-control', 'public, s-maxage=20, stale-while-revalidate=60');
+      return res.status(200).json({ ok: true, ...(await walletProfile(wallet)) });
+    }
+    if (path === 'reviews' && req.method === 'GET') {
+      const wallet = validWallet(requestUrl.searchParams.get('wallet'));
+      return res.status(200).json({ ok: true, reviews: (await supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`)) || [] });
+    }
+    if (path === 'reviews' && req.method === 'POST') {
+      const body = JSON.parse((await readBody(req)).toString() || '{}');
+      const wallet = validWallet(body.wallet); const category = String(body.category || 'observation').slice(0, 40); const text = String(body.text || '').trim().slice(0, 1200); const authorWallet = body.author_wallet ? validWallet(body.author_wallet) : null;
+      if (text.length < 12) throw Object.assign(new Error('Review must contain at least 12 characters.'), { status: 400 });
+      if (!SUPABASE_URL || !SUPABASE_KEY) throw Object.assign(new Error('Review database is not configured.'), { status: 503 });
+      const rows = await supabase('rep_reviews', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ wallet, author_wallet: authorWallet, category, text, evidence_url: String(body.evidence_url || '').slice(0, 500) || null }) });
+      return res.status(201).json({ ok: true, review: rows?.[0] || null });
+    }
     if (!['world', 'coins', 'launch', 'tick'].includes(path)) return res.status(404).json({ ok: false, error: 'Not found' });
     const target = new URL(`https://www.wrlddo.trade/api/${path}`);
     for (const [key, value] of Object.entries(req.query)) if (key !== 'path' && value != null) target.searchParams.set(key, Array.isArray(value) ? value[0] : value);

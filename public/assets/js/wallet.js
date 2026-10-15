@@ -1,0 +1,22 @@
+(() => {
+  const params = new URLSearchParams(location.search);
+  const wallet = params.get('wallet') || params.get('m') || location.pathname.split('/').filter(Boolean).pop() || '';
+  const $ = s => document.querySelector(s);
+  const short = value => value ? `${value.slice(0, 8)}…${value.slice(-6)}` : 'unknown';
+  const money = value => Number.isFinite(Number(value)) ? `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(2)} SOL` : '—';
+  const set = (selector, value) => { const el = $(selector); if (el) el.textContent = value; };
+  set('#wallet', wallet || 'unknown'); set('#walletShort', short(wallet)); set('#walletName', wallet ? `wallet / ${short(wallet)}` : 'wallet not found');
+  $('#copy')?.addEventListener('click', () => navigator.clipboard?.writeText(wallet));
+  function render(profile) {
+    set('#grade', profile.grade || '—'); set('#scoreLabel', `${profile.score ?? 0}/100 reputation score`); set('#balance', `${Number(profile.balanceSol || 0).toFixed(3)} SOL`);
+    const indicators = profile.indicators || {}; set('#pnl', money(indicators.pnl)); set('#winRate', indicators.winRate ? `${Number(indicators.winRate).toFixed(1)}%` : '—'); set('#trades', Number(indicators.trades || 0).toLocaleString());
+    const list = $('#indicators');
+    list.innerHTML = [['win rate', indicators.winRate ? `${Number(indicators.winRate).toFixed(1)}%` : 'not enough data'], ['realized PNL', money(indicators.pnl)], ['trade sample', `${Number(indicators.trades || 0).toLocaleString()} observed`], ['community warnings', `${Number(indicators.warnings || 0)} reported`], ['positive signals', `${Number(indicators.positive || 0)} logged`]].map(([label, value]) => `<div class="row"><span class="nm">${label}</span><span class="vl">${value}</span></div>`).join('');
+    const txs = profile.transactions || []; $('#transactions').innerHTML = txs.length ? txs.map(tx => `<div class="row tx"><span class="nm"><b>${tx.type}</b><span class="meta">${tx.token || 'Solana activity'}${tx.signature ? ` · ${tx.signature.slice(0, 8)}…` : ''}</span></span><span class="vl">${tx.valueUsd ? `$${Number(tx.valueUsd).toLocaleString()}` : 'on-chain'}</span></div>`).join('') : '<div class="empty">No recent transactions returned.</div>';
+    renderReviews(profile.reviews || []);
+  }
+  function renderReviews(reviews) { set('#reviewCount', `${reviews.length} review${reviews.length === 1 ? '' : 's'} · evidence matters`); $('#reviews').innerHTML = reviews.length ? reviews.map(r => `<article class="review"><div><span class="tag">${r.category || 'observation'}</span><span class="dim">${r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}</span></div><p>${String(r.text || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</p>${r.evidence_url ? `<a class="u" href="${r.evidence_url}" target="_blank" rel="noopener">open evidence ↗</a>` : ''}</article>`).join('') : '<div class="empty">No reviews logged yet. Be the first to add a specific, evidence-backed signal.</div>'; }
+  async function load() { if (!wallet) return; try { const r = await fetch(`/api/wallet?address=${encodeURIComponent(wallet)}`); const data = await r.json(); if (!r.ok || !data.ok) throw new Error(data.error || 'Wallet profile unavailable'); render(data); } catch (error) { $('#error').hidden = false; $('#error').textContent = error.message; } }
+  $('#reviewForm')?.addEventListener('submit', async event => { event.preventDefault(); const status = $('#reviewStatus'); status.textContent = 'publishing…'; try { const r = await fetch('/api/reviews', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({ wallet, category: $('#category').value, text: $('#reviewText').value, evidence_url: $('#evidence').value }) }); const data = await r.json(); if (!r.ok || !data.ok) throw new Error(data.error || 'Could not publish review'); $('#reviewText').value = ''; $('#evidence').value = ''; status.textContent = 'review logged'; load(); } catch (error) { status.textContent = error.message; } });
+  load();
+})();
