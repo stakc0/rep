@@ -120,8 +120,8 @@ function scoreWallet({ performance, reviews = [] }) {
   const winRate = Number(p.win_rate ?? p.winRate ?? p.metrics?.win_rate ?? 0);
   const pnl = Number(p.total_pnl ?? p.realized_pnl ?? p.realizedPnl ?? p.metrics?.total_pnl ?? 0);
   const trades = Number(p.total_trades ?? p.trade_count ?? p.metrics?.total_trades ?? 0);
-  const warnings = reviews.filter(r => ['warning', 'exploitative', 'scam'].includes(String(r.category || '').toLowerCase())).length;
-  const positive = reviews.filter(r => ['positive', 'reliable', 'helpful'].includes(String(r.category || '').toLowerCase())).length;
+  const warnings = reviews.filter(r => ['warning', 'exploitative', 'scam', 'abuse', 'investigation'].includes(String(r.category || '').toLowerCase())).length;
+  const positive = reviews.filter(r => ['positive', 'reliable', 'helpful', 'praise'].includes(String(r.category || '').toLowerCase())).length;
   const base = Math.round(Math.min(55, Math.max(0, winRate * .55)) + Math.min(25, Math.max(0, Math.log10(Math.max(1, Math.abs(pnl) + 1)) * 8)) + Math.min(15, trades / 20) + Math.min(10, positive * 2) - Math.min(35, warnings * 7));
   const total = Math.max(0, Math.min(100, base));
   return { score: total, grade: total >= 85 ? 'A+' : total >= 75 ? 'A' : total >= 65 ? 'B+' : total >= 52 ? 'B' : total >= 38 ? 'C' : 'D', indicators: { winRate, pnl, trades, warnings, positive } };
@@ -154,6 +154,11 @@ async function kolscanLeaderboard() {
     throw error;
   }
 }
+async function kolscanIdentity(wallet) {
+  const row = (await kolscanLeaderboard().catch(() => [])).find(item => item.wallet === wallet);
+  if (!row) return null;
+  return { display_name: row.name || null, avatar_url: row.avatar || null, x_url: row.twitter || null, x_handle: row.twitter?.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1] || null, identity_source: 'kolscan' };
+}
 async function indexKolscan() {
   const rows = await kolscanLeaderboard();
   let indexed = 0;
@@ -168,12 +173,13 @@ async function indexKolscan() {
 async function walletProfile(wallet) {
   const cached = await cachedProfile(wallet);
   if (cached) return cached;
-  const [portfolio, feed, performance, reviews, balance] = await Promise.all([
+  const [portfolio, feed, performance, reviews, balance, identity] = await Promise.all([
     cielo(`${wallet}/portfolio`).catch(() => null),
     cielo('feed', { wallet, chains: 'solana', limit: 5 }).catch(() => null),
     cielo(`${wallet}/enhanced-stats/profitability-performance`, { days: 'max' }).catch(() => null),
     supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`).catch(() => []),
     rpc('getBalance', [wallet, { commitment: 'confirmed' }]).catch(() => null),
+    kolscanIdentity(wallet),
   ]);
   const portfolioData = portfolio?.data || portfolio || {};
   const feedItems = feed?.data?.items || feed?.data?.transactions || feed?.items || feed?.transactions || [];
@@ -181,7 +187,7 @@ async function walletProfile(wallet) {
   const txs = feedItems.slice(0, 5).map(normalizeTx);
   const rep = scoreWallet({ performance, reviews: reviews || [] });
   const indexedAt = new Date().toISOString();
-  const profile = { wallet, balanceSol: sol, portfolioUsd: Number(portfolioData.total_usd_value || 0), transactions: txs, performance: performance?.data || performance || null, score: rep.score, grade: rep.grade, indicators: rep.indicators, reviews: reviews || [], indexedAt: Date.parse(indexedAt) };
+  const profile = { ...(identity || {}), wallet, balanceSol: sol, portfolioUsd: Number(portfolioData.total_usd_value || 0), transactions: txs, performance: performance?.data || performance || null, score: rep.score, grade: rep.grade, indicators: rep.indicators, reviews: reviews || [], indexedAt: Date.parse(indexedAt) };
   walletMemoryCache.set(wallet, { cachedAt: Date.now(), profile });
   await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet, score: rep.score, grade: rep.grade, indicators: rep.indicators, last_balance_sol: sol, performance: profile.performance, transactions: txs, profile: { portfolioUsd: profile.portfolioUsd }, last_seen_at: indexedAt, updated_at: indexedAt }) }).catch(() => null);
   await supabase('rep_score_events', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ wallet, score: rep.score, grade: rep.grade, indicators: rep.indicators, reason: 'index_refresh' }) }).catch(() => null);
@@ -214,7 +220,7 @@ export default async function handler(req, res) {
     }
     if (path === 'profile' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('wallet'));
-      return res.status(200).json({ ok: true, profile: (await supabase(`rep_profiles?wallet=eq.${encodeURIComponent(wallet)}&select=*`).catch(() => []))?.[0] || null });
+      const stored = (await supabase(`rep_profiles?wallet=eq.${encodeURIComponent(wallet)}&select=*`).catch(() => []))?.[0] || null; return res.status(200).json({ ok: true, profile: stored || await kolscanIdentity(wallet) });
     }
     if (path === 'profile' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');

@@ -8,7 +8,7 @@
   set('#wallet', wallet || 'unknown'); set('#walletShort', short(wallet)); set('#walletName', wallet ? `wallet / ${short(wallet)}` : 'wallet not found');
   $('#copy')?.addEventListener('click', () => navigator.clipboard?.writeText(wallet));
   function render(profile) {
-    set('#grade', profile.grade || '—'); set('#scoreLabel', `${profile.score ?? 0}/100 reputation score`); set('#balance', `${Number(profile.balanceSol || 0).toFixed(3)} SOL`);
+    set('#walletName', profile.display_name || (profile.x_handle ? `@${profile.x_handle}` : `wallet / ${short(profile.wallet || wallet)}`)); set('#grade', profile.grade || '—'); set('#scoreLabel', `${profile.score ?? 0}/100 reputation score`); set('#balance', `${Number(profile.balanceSol || 0).toFixed(3)} SOL`);
     const indicators = profile.indicators || {}; set('#pnl', money(indicators.pnl)); set('#winRate', indicators.winRate ? `${Number(indicators.winRate).toFixed(1)}%` : '—'); set('#trades', Number(indicators.trades || 0).toLocaleString());
     const list = $('#indicators');
     list.innerHTML = [['win rate', indicators.winRate ? `${Number(indicators.winRate).toFixed(1)}%` : 'not enough data'], ['realized PNL', money(indicators.pnl)], ['trade sample', `${Number(indicators.trades || 0).toLocaleString()} observed`], ['community warnings', `${Number(indicators.warnings || 0)} reported`], ['positive signals', `${Number(indicators.positive || 0)} logged`]].map(([label, value]) => `<div class="row"><span class="nm">${label}</span><span class="vl">${value}</span></div>`).join('');
