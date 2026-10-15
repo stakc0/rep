@@ -5,11 +5,11 @@
   const verified = '<img class="verified-check" src="/assets/img/verified-check.png" alt="verified" title="X identity indexed">';
   let wallets = []; let voteCounts = {};
   const score = r => { const state = voteState(r.wallet); const up = Number(r.votes_up || state.up || 0); const down = Number(r.votes_down || state.down || 0); const total = up + down; return total ? Math.round((up / total) * 100) : 50; };
-  const avatar = r => r.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(String(r.avatar).replace(/\\+$/, ''))}" alt="" loading="lazy">` : `<span class="wallet-fallback">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
+  const avatar = r => r.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(String(r.avatar).replace(/\\+$/, ''))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='/assets/img/fav32.png'">` : `<span class="wallet-fallback">${esc((r.name || 'W').slice(0,1).toUpperCase())}</span>`;
   function voteState(wallet) { try { return { ...(voteCounts[wallet] || {}), ...JSON.parse(localStorage.getItem(`rep-vote:${wallet}`) || '{}') }; } catch { return voteCounts[wallet] || {}; } }
   function render() {
     const q = ($('#walletSearch')?.value || '').toLowerCase().trim();
-    const rows = wallets.filter(r => `${r.name || ''} ${r.twitter || ''} ${r.wallet || ''}`.toLowerCase().includes(q));
+    const rows = wallets.filter(r => `${r.name || ''} ${r.twitter || ''} ${r.wallet || ''}`.toLowerCase().includes(q)).sort((a, b) => score(b) - score(a) || Number(b.x_followers || 0) - Number(a.x_followers || 0));
     $('#walletDirectory').innerHTML = rows.length ? rows.map((r, i) => `<a class="rank-card" href="/token?wallet=${encodeURIComponent(r.wallet)}"><span class="rank-number">${String(i + 1).padStart(2, '0')}</span>${avatar(r)}<span class="rank-identity"><b>${esc(r.name || 'unnamed wallet')} ${r.x_followers != null || r.x_verified ? verified : ''}</b><small>${r.twitter ? `@${esc(r.twitter.split('/').pop())}` : short(r.wallet)}</small><small>${short(r.wallet)}</small></span><span class="rank-score"><strong>${score(r)}</strong><small>REP score</small></span><span class="rank-votes"><button class="vote up" aria-label="thumbs up" data-vote="1" data-wallet="${r.wallet}">👍 <b>${voteState(r.wallet).up || r.votes_up || 0}</b></button><button class="vote down" aria-label="thumbs down" data-vote="-1" data-wallet="${r.wallet}">👎 <b>${voteState(r.wallet).down || r.votes_down || 0}</b></button></span></a>`).join('') : '<div class="empty-state">No wallet matches that search.</div>';
     $('#walletCount').textContent = wallets.length;
     $('#searchCount').textContent = q ? `${rows.length} matches` : 'all wallets';
