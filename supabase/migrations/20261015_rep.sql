@@ -83,6 +83,14 @@ create table if not exists public.rep_reviews (
 alter table public.rep_reviews add column if not exists rating smallint not null default 3;
 create index if not exists rep_reviews_wallet_created_idx on public.rep_reviews(wallet, created_at desc);
 
+create table if not exists public.rep_votes (
+  id bigint generated always as identity primary key,
+  wallet text not null references public.rep_wallets(wallet) on delete cascade,
+  vote smallint not null check (vote in (-1, 1)),
+  created_at timestamptz not null default now()
+);
+create index if not exists rep_votes_wallet_created_idx on public.rep_votes(wallet, created_at desc);
+
 create table if not exists public.rep_wallet_links (
   id bigint generated always as identity primary key,
   main_wallet text not null references public.rep_wallets(wallet) on delete cascade,

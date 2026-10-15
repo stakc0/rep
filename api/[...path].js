@@ -77,6 +77,7 @@ const SVS_RPC = process.env.SVS_RPC_HTTPS_ENDPOINT || process.env.PUMP_RPC_URL |
 const walletMemoryCache = new Map();
 const kolscanCache = { at: 0, wallets: [], staleAt: 0 };
 const reviewMemory = new Map();
+const voteMemory = new Map();
 const CACHE_TTL_MS = 45_000;
 const KOLSCAN_TTL_MS = 60_000;
 
@@ -248,6 +249,7 @@ export default async function handler(req, res) {
     if (path === 'kolscan' && req.method === 'GET') { const wallets = await kolscanLeaderboard(); res.setHeader('cache-control', 'public, s-maxage=60, stale-while-revalidate=300'); return res.status(200).json({ ok: true, source: 'kolscan', wallets, indexedAt: kolscanCache.at, cacheAgeMs: Date.now() - kolscanCache.at }); }
     if (path === 'index/kolscan' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexKolscan()) });
     if ((path === 'index/x-profiles' || path === 'x-profiles-index') && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexXProfiles()) });
+    if (path === 'vote' && req.method === 'POST') { const body = JSON.parse((await readBody(req)).toString() || '{}'); const wallet = validWallet(body.wallet); const vote = Number(body.vote) < 0 ? -1 : 1; const current = voteMemory.get(wallet) || { up: 0, down: 0 }; voteMemory.set(wallet, { up: current.up + (vote > 0 ? 1 : 0), down: current.down + (vote < 0 ? 1 : 0) }); await supabase('rep_votes', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ wallet, vote }) }).catch(() => null); return res.status(200).json({ ok: true, wallet, ...voteMemory.get(wallet) }); }
     if (path === 'wallet' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('address'));
       res.setHeader('cache-control', 'public, s-maxage=20, stale-while-revalidate=60');
