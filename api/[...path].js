@@ -128,6 +128,33 @@ function normalizeTx(item) {
   const x = item?.tx || item?.transaction || item;
   return { signature: x?.tx_hash || x?.signature || x?.hash || x?.transaction_hash || '', type: x?.tx_type || x?.type || x?.event_type || 'activity', token: x?.token_symbol || x?.token?.symbol || x?.token_name || '', valueUsd: Number(x?.value_usd || x?.amount_usd || x?.value || 0), timestamp: x?.timestamp || x?.block_timestamp || x?.datetime || null, source: 'cielo' };
 }
+function stripHtml(value = '') { return String(value).replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&#x27;/g, "'").replace(/&quot;/g, '"').trim(); }
+async function kolscanLeaderboard() {
+  const r = await fetch('https://kolscan.io/leaderboard', { headers: { 'user-agent': 'REP reputation index/1.0', accept: 'text/html' }, signal: AbortSignal.timeout(20000) });
+  if (!r.ok) throw Object.assign(new Error(`Kolscan returned ${r.status}`), { status: 502 });
+  const html = await r.text(); const wallets = new Map();
+  const accounts = /href="\/account\/([1-9A-HJ-NP-Za-km-z]{32,44})\?timeframe=1"/g;
+  let match;
+  while ((match = accounts.exec(html))) {
+    const wallet = match[1]; const chunk = html.slice(match.index, match.index + 2600); const name = stripHtml((chunk.match(/<h1[^>]*>(.*?)<\/h1>/) || [])[1] || ''); const avatar = (chunk.match(/https:\/\/kolscan-images\.pump\.fun\/profiles\/[^" ]+/) || [])[0] || '';
+    const dataChunk = html.slice(Math.max(0, match.index - 2000), match.index + 5000); const twitterMatch = dataChunk.match(/x\.com[\\\\/]+([A-Za-z0-9_]+)/); const twitter = twitterMatch ? `https://x.com/${twitterMatch[1]}` : '';
+    const profitText = stripHtml((chunk.match(/<h1[^>]*>[^<]*<\/h1>[\s\S]{0,500}?<p[^>]*>[+−-]?([\d,.]+)[^<]*(?:SOL|USD)/) || [])[1] || '0');
+    const profit = Number(profitText.replaceAll(',', '')) || 0;
+    wallets.set(wallet, { wallet, name, avatar, twitter, profit, source: 'kolscan' });
+  }
+  return [...wallets.values()];
+}
+async function indexKolscan() {
+  const rows = await kolscanLeaderboard();
+  let indexed = 0;
+  for (const row of rows) {
+    const handle = row.twitter.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1] || null;
+    await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, display_name: row.name || null, avatar_url: row.avatar || null, kolscan_profit: row.profit, profile: { source: row.source }, last_seen_at: new Date().toISOString(), updated_at: new Date().toISOString() }) }).catch(() => null);
+    await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, x_handle: handle, display_name: row.name || null, avatar_url: row.avatar || null, updated_at: new Date().toISOString() }) }).catch(() => null);
+    indexed++;
+  }
+  return { source: 'kolscan', found: rows.length, indexed, at: Date.now() };
+}
 async function walletProfile(wallet) {
   const cached = await cachedProfile(wallet);
   if (cached) return cached;
@@ -168,6 +195,7 @@ export default async function handler(req, res) {
     if (path === 'tokens' && req.method === 'GET') { res.setHeader('cache-control', 'public, s-maxage=15, stale-while-revalidate=60'); return res.status(200).json({ ok: true, at: Date.now(), creatorFeeWallet: CREATOR_FEE_WALLET, tokens: await listedTokens() }); }
     if (path === 'politics' && req.method === 'GET') return res.status(200).json(await politicsNews());
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
+    if (path === 'index/kolscan' && (req.method === 'POST' || req.method === 'GET')) return res.status(200).json({ ok: true, ...(await indexKolscan()) });
     if (path === 'wallet' && req.method === 'GET') {
       const wallet = validWallet(requestUrl.searchParams.get('address'));
       res.setHeader('cache-control', 'public, s-maxage=20, stale-while-revalidate=60');

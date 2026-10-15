@@ -13,6 +13,9 @@ create table if not exists public.rep_wallets (
 alter table public.rep_wallets add column if not exists performance jsonb;
 alter table public.rep_wallets add column if not exists transactions jsonb not null default '[]'::jsonb;
 alter table public.rep_wallets add column if not exists profile jsonb not null default '{}'::jsonb;
+alter table public.rep_wallets add column if not exists display_name text;
+alter table public.rep_wallets add column if not exists avatar_url text;
+alter table public.rep_wallets add column if not exists kolscan_profit numeric;
 
 create table if not exists public.rep_profiles (
   wallet text primary key references public.rep_wallets(wallet) on delete cascade,
