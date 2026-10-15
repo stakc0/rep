@@ -186,11 +186,11 @@ async function kolscanIdentity(wallet) {
   return { display_name: row.name || null, avatar_url: row.avatar || null, x_url: row.twitter || null, x_handle: row.twitter?.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1] || null, identity_source: 'kolscan' };
 }
 async function indexXProfiles() {
-  const rows = await kolscanLeaderboard(); const handles = rows.map(row => row.twitter?.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1]).filter(Boolean); let indexed = 0; let failed = null;
+  const rows = await kolscanLeaderboard(); const handles = rows.map(row => row.twitter?.match(/x\.com\/([A-Za-z0-9_]+)/)?.[1]).filter(Boolean); let indexed = 0; let failed = null; const indexedProfiles = [];
   for (let i = 0; i < handles.length; i += 100) {
-    try { const profiles = await xProfiles(handles.slice(i, i + 100)); for (const profile of profiles) { const row = rows.find(item => item.twitter?.toLowerCase().endsWith(`/${profile.x_handle.toLowerCase()}`)); if (!row) continue; await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, ...profile, updated_at: new Date().toISOString() }) }).catch(() => null); await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, display_name: profile.display_name, avatar_url: profile.avatar_url, profile: { source: 'x_api', x_followers: profile.x_followers, x_verified: profile.x_verified } }) }).catch(() => null); indexed++; } } catch (error) { failed = error.message; break; }
+    try { const profiles = await xProfiles(handles.slice(i, i + 100)); for (const profile of profiles) { const row = rows.find(item => item.twitter?.toLowerCase().endsWith(`/${profile.x_handle.toLowerCase()}`)); if (!row) continue; await supabase('rep_profiles', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, ...profile, updated_at: new Date().toISOString() }) }).catch(() => null); await supabase('rep_wallets', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ wallet: row.wallet, display_name: profile.display_name, avatar_url: profile.avatar_url, profile: { source: 'x_api', x_followers: profile.x_followers, x_verified: profile.x_verified } }) }).catch(() => null); indexedProfiles.push({ wallet: row.wallet, ...profile }); indexed++; } } catch (error) { failed = error.message; break; }
   }
-  return { source: 'x_api', candidates: handles.length, indexed, failed };
+  return { source: 'x_api', candidates: handles.length, indexed, failed, profiles: indexedProfiles };
 }
 async function indexKolscan() {
   const rows = await kolscanLeaderboard();
