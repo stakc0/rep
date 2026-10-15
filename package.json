@@ -7,10 +7,10 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "node scripts/build.mjs && node server.mjs",
+    "dev": "node scripts/build.mjs && node local-server.mjs",
     "build": "node --check launch-direct.mjs && node --check assets/js/launch.js && node --check 'api/[...path].js'",
-    "start": "node server.mjs",
-    "preview": "node server.mjs",
+    "start": "node local-server.mjs",
+    "preview": "node local-server.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
