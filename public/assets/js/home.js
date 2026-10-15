@@ -17,6 +17,10 @@
     $('#searchCount').textContent = q ? `${rows.length} matches` : 'all wallets';
   }
 
+
+  const featuredMint = 'CNroNnbxi4DFg7tj7HYP3fsgnHdcL7zdxg75RZQspump';
+  const money = n => Number(n || 0) >= 1000000 ? `$${(Number(n)/1000000).toFixed(2)}M` : Number(n || 0) >= 1000 ? `$${(Number(n)/1000).toFixed(1)}K` : `$${Number(n || 0).toFixed(2)}`;
+  async function loadFeaturedToken() { try { const res = await fetch(`/api/token?mint=${featuredMint}&t=${Date.now()}`, { cache:'no-store' }); const data = await res.json(); const t=data.token || {}; if (res.ok && t.found) { $('#tokenMc').textContent=money(t.marketCapUsd); $('#tokenVol').textContent=money(t.volume24hUsd); $('#tokenPrice').textContent=money(t.priceUsd); $('#tokenLiq').textContent=money(t.liquidityUsd); $('#tokenUpdated').textContent=`Dexscreener live · ${new Date(data.at).toLocaleTimeString()}`; } } catch { $('#tokenUpdated').textContent='Dexscreener temporarily unavailable'; } }
   function renderLiveReviews(reviews) { const node = $('#liveReviewFeed'); if (!node) return; node.innerHTML = reviews.length ? reviews.slice(0, 8).map(r => `<article class="mini-review"><div class="mini-review-top"><span class="mini-avatar">${r.account?.avatar ? `<img src="/api/avatar?url=${encodeURIComponent(r.account.avatar)}" onerror="this.onerror=null;this.src='/assets/img/fav32.png'" alt="">` : '◉'}</span><span><span class="tag ${esc(r.category || 'observation')}">${esc(r.category || 'observation')}</span><span class="review-stars">${'★'.repeat(Number(r.rating || 0))}</span></span></div><p>${esc(r.text)}</p><a href="/token?wallet=${encodeURIComponent(r.wallet)}">${esc(r.account?.name || short(r.wallet))} ↗</a></article>`).join('') : '<div class="empty-state">No reviews yet.</div>'; }
   async function loadLiveReviews() { try { const res = await fetch(`/api/reviews?feed=1&t=${Date.now()}`, { cache:'no-store' }); const data = await res.json(); if (res.ok && data.ok) renderLiveReviews(data.reviews || []); } catch {} }
   if (wallets.length) render();
@@ -32,5 +36,7 @@
   load('/api/kolscan', true);
   loadVotes();
   loadLiveReviews();
+  loadFeaturedToken();
+  setInterval(loadFeaturedToken, 10000);
   setInterval(loadLiveReviews, 5000);
 })();

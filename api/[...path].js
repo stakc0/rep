@@ -56,6 +56,7 @@ async function tokenMarkets() {
   }));
   return tokens;
 }
+async function dexToken(mint) { const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${encodeURIComponent(mint)}`, { headers: { accept: 'application/json', 'user-agent': 'rep.fun/1.0' }, signal: AbortSignal.timeout(6000) }); if (!r.ok) throw new Error(`Dexscreener returned ${r.status}`); const j = await r.json(); const pairs = (j.pairs || []).filter(x => x.chainId === 'solana').sort((a, b) => Number(b.liquidity?.usd || 0) - Number(a.liquidity?.usd || 0)); const pair = pairs[0]; if (!pair) return { mint, found: false }; return { mint, found: true, symbol: pair.baseToken?.symbol || '', name: pair.baseToken?.name || '', priceUsd: Number(pair.priceUsd || 0), marketCapUsd: Number(pair.marketCap || pair.fdv || 0), volume24hUsd: Number(pair.volume?.h24 || 0), liquidityUsd: Number(pair.liquidity?.usd || 0), priceChange24h: Number(pair.priceChange?.h24 || 0), dexUrl: pair.url || '', pairAddress: pair.pairAddress || '' }; }
 async function listedTokens() {
   if (Date.now() - tokenCache.at < 10000) return tokenCache.tokens;
   tokenCache = { at: Date.now(), tokens: await tokenMarkets() }; return tokenCache.tokens;
@@ -245,6 +246,7 @@ export default async function handler(req, res) {
       return res.status(200).json(await directConfirm(body));
     }
     if (path === 'avatar' && req.method === 'GET') { const raw = (requestUrl.searchParams.get('url') || '').replace(/\\+$/, ''); const imageUrl = new URL(raw); if (!['pbs.twimg.com', 'kolscan-images.pump.fun'].includes(imageUrl.hostname)) throw Object.assign(new Error('Image source not allowed.'), { status: 400 }); const upstream = await fetch(imageUrl, { headers: { 'user-agent': 'REP identity cache/1.0' }, signal: AbortSignal.timeout(10000) }); if (!upstream.ok) return res.status(upstream.status).end(); const data = Buffer.from(await upstream.arrayBuffer()); res.status(200); res.setHeader('content-type', upstream.headers.get('content-type') || 'image/jpeg'); res.setHeader('cache-control', 'public, max-age=31536000, immutable'); return res.send(data); }
+    if (path === 'token' && req.method === 'GET') { const mint = validWallet(requestUrl.searchParams.get('mint')); const token = await dexToken(mint); res.setHeader('cache-control', 'public, s-maxage=8, stale-while-revalidate=20'); return res.status(200).json({ ok: true, at: Date.now(), token }); }
     if (path === 'tokens' && req.method === 'GET') { res.setHeader('cache-control', 'public, s-maxage=15, stale-while-revalidate=60'); return res.status(200).json({ ok: true, at: Date.now(), creatorFeeWallet: CREATOR_FEE_WALLET, tokens: await listedTokens() }); }
     if (path === 'politics' && req.method === 'GET') return res.status(200).json(await politicsNews());
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
