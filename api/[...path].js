@@ -137,9 +137,8 @@ async function kolscanLeaderboard() {
   let match;
   while ((match = accounts.exec(html))) {
     const wallet = match[1]; const chunk = html.slice(match.index, match.index + 2600); const name = stripHtml((chunk.match(/<h1[^>]*>(.*?)<\/h1>/) || [])[1] || ''); const avatar = (chunk.match(/https:\/\/kolscan-images\.pump\.fun\/profiles\/[^" ]+/) || [])[0] || '';
-    const dataChunk = html.slice(Math.max(0, match.index - 2000), match.index + 5000); const twitterMatch = dataChunk.match(/x\.com[\\\\/]+([A-Za-z0-9_]+)/); const twitter = twitterMatch ? `https://x.com/${twitterMatch[1]}` : '';
-    const profitText = stripHtml((chunk.match(/<h1[^>]*>[^<]*<\/h1>[\s\S]{0,500}?<p[^>]*>[+−-]?([\d,.]+)[^<]*(?:SOL|USD)/) || [])[1] || '0');
-    const profit = Number(profitText.replaceAll(',', '')) || 0;
+    const marker = `wallet_address\\":\\"${wallet}`; const dataPos = html.indexOf(marker); const dataChunk = dataPos >= 0 ? html.slice(dataPos, dataPos + 1800).replaceAll('\\"', '"') : ''; const xPos = dataChunk.indexOf('"twitter":"'); const xEnd = xPos >= 0 ? dataChunk.indexOf('"', xPos + 11) : -1; const twitter = xPos >= 0 && xEnd > xPos ? dataChunk.slice(xPos + 11, xEnd) : '';
+    const profit = Number(dataChunk.match(/\"profit\":(-?[0-9.]+)/)?.[1] || 0);
     wallets.set(wallet, { wallet, name, avatar, twitter, profit, source: 'kolscan' });
   }
   return [...wallets.values()];
