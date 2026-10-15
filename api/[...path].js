@@ -231,8 +231,8 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, profile: rows?.[0] || null });
     }
     if (path === 'reviews' && req.method === 'GET') {
-      const wallet = validWallet(requestUrl.searchParams.get('wallet'));
-      return res.status(200).json({ ok: true, reviews: (await supabase(`rep_reviews?wallet=eq.${encodeURIComponent(wallet)}&select=*&order=created_at.desc&limit=50`)) || [] });
+      const walletParam = requestUrl.searchParams.get('wallet'); const query = walletParam ? `rep_reviews?wallet=eq.${encodeURIComponent(validWallet(walletParam))}&select=*&order=created_at.desc&limit=50` : 'rep_reviews?select=*&order=created_at.desc&limit=50';
+      return res.status(200).json({ ok: true, reviews: (await supabase(query)) || [] });
     }
     if (path === 'reviews' && req.method === 'POST') {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
