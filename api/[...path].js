@@ -226,6 +226,16 @@ export default async function handler(req, res) {
       walletMemoryCache.delete(wallet);
       return res.status(201).json({ ok: true, review: rows?.[0] || null });
     }
+    if (path === 'links' && req.method === 'GET') {
+      const wallet = validWallet(requestUrl.searchParams.get('wallet')); const links = (await supabase(`rep_wallet_links?or=(main_wallet.eq.${encodeURIComponent(wallet)},linked_wallet.eq.${encodeURIComponent(wallet)})&select=*&order=created_at.desc&limit=50`)) || [];
+      return res.status(200).json({ ok: true, links });
+    }
+    if (path === 'links' && req.method === 'POST') {
+      const body = JSON.parse((await readBody(req)).toString() || '{}'); const mainWallet = validWallet(body.main_wallet || body.wallet); const linkedWallet = validWallet(body.linked_wallet);
+      if (mainWallet === linkedWallet) throw Object.assign(new Error('A wallet cannot link to itself.'), { status: 400 });
+      const relation = String(body.relation || 'suspected_bundle').slice(0, 40); const rows = await supabase('rep_wallet_links', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ main_wallet: mainWallet, linked_wallet: linkedWallet, relation, evidence_url: String(body.evidence_url || '').slice(0, 500) || null }) });
+      return res.status(201).json({ ok: true, link: rows?.[0] || null });
+    }
     if (!['world', 'coins', 'launch', 'tick'].includes(path)) return res.status(404).json({ ok: false, error: 'Not found' });
     const target = new URL(`https://www.wrlddo.trade/api/${path}`);
     for (const [key, value] of Object.entries(req.query)) if (key !== 'path' && value != null) target.searchParams.set(key, Array.isArray(value) ? value[0] : value);

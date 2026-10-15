@@ -59,16 +59,31 @@ create table if not exists public.rep_reviews (
 );
 
 create index if not exists rep_reviews_wallet_created_idx on public.rep_reviews(wallet, created_at desc);
+
+create table if not exists public.rep_wallet_links (
+  id bigint generated always as identity primary key,
+  main_wallet text not null references public.rep_wallets(wallet) on delete cascade,
+  linked_wallet text not null references public.rep_wallets(wallet) on delete cascade,
+  relation text not null default 'suspected_bundle',
+  evidence_url text,
+  created_at timestamptz not null default now(),
+  unique (main_wallet, linked_wallet)
+);
+create index if not exists rep_wallet_links_main_idx on public.rep_wallet_links(main_wallet, created_at desc);
+create index if not exists rep_wallet_links_linked_idx on public.rep_wallet_links(linked_wallet, created_at desc);
 alter table public.rep_wallets enable row level security;
 alter table public.rep_profiles enable row level security;
 alter table public.rep_wallet_transactions enable row level security;
 alter table public.rep_score_events enable row level security;
 alter table public.rep_reviews enable row level security;
+alter table public.rep_wallet_links enable row level security;
 create policy "public can read REP profiles" on public.rep_profiles for select using (true);
 create policy "public can read REP transactions" on public.rep_wallet_transactions for select using (true);
 create policy "public can read REP score events" on public.rep_score_events for select using (true);
 create policy "public can read REP wallets" on public.rep_wallets for select using (true);
 create policy "public can read REP reviews" on public.rep_reviews for select using (true);
+create policy "public can read REP wallet links" on public.rep_wallet_links for select using (true);
+create policy "service role writes REP wallet links" on public.rep_wallet_links for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 create policy "service role writes REP wallets" on public.rep_wallets for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 create policy "service role writes REP profiles" on public.rep_profiles for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 create policy "service role writes REP transactions" on public.rep_wallet_transactions for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
