@@ -243,6 +243,7 @@ export default async function handler(req, res) {
       const body = JSON.parse((await readBody(req)).toString() || '{}');
       return res.status(200).json(await directConfirm(body));
     }
+    if (path === 'avatar' && req.method === 'GET') { const raw = requestUrl.searchParams.get('url') || ''; const imageUrl = new URL(raw); if (!['pbs.twimg.com', 'kolscan-images.pump.fun'].includes(imageUrl.hostname)) throw Object.assign(new Error('Image source not allowed.'), { status: 400 }); const upstream = await fetch(imageUrl, { headers: { 'user-agent': 'REP identity cache/1.0' }, signal: AbortSignal.timeout(10000) }); if (!upstream.ok) return res.status(upstream.status).end(); const data = Buffer.from(await upstream.arrayBuffer()); res.status(200); res.setHeader('content-type', upstream.headers.get('content-type') || 'image/jpeg'); res.setHeader('cache-control', 'public, max-age=31536000, immutable'); return res.send(data); }
     if (path === 'tokens' && req.method === 'GET') { res.setHeader('cache-control', 'public, s-maxage=15, stale-while-revalidate=60'); return res.status(200).json({ ok: true, at: Date.now(), creatorFeeWallet: CREATOR_FEE_WALLET, tokens: await listedTokens() }); }
     if (path === 'politics' && req.method === 'GET') return res.status(200).json(await politicsNews());
     if (path === 'polymarket' && req.method === 'GET') return res.status(200).json(await politicalMarkets());
